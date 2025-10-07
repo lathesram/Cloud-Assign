@@ -69,7 +69,18 @@ export class MessagingServer {
   }
 
   public async start(): Promise<void> {
-    this.httpServer.listen(this.port);
+    try {
+      console.log('🚀 Starting Messaging Service...');
+      
+      this.httpServer.listen(this.port, () => {
+        console.log(`✅ Messaging Service is running on port ${this.port}`);
+        console.log(`📍 Health check: http://localhost:${this.port}/health`);
+        console.log(`🔌 Socket.IO server initialized`);
+      });
+    } catch (error) {
+      console.error('❌ Failed to start Messaging Service:', error);
+      throw error;
+    }
   }
 }
 

@@ -40,8 +40,30 @@ export class Server {
   }
 
   public async start(): Promise<void> {
-    await checkDynamoDBConnection();
-    this.app.listen(this.port);
+    try {
+      console.log('🚀 Starting Booking Service...');
+      
+      // Skip DynamoDB connection check in development
+      if (process.env.NODE_ENV !== 'development') {
+        console.log('📊 Checking DynamoDB connection...');
+        const dbConnected = await checkDynamoDBConnection();
+        if (dbConnected) {
+          console.log('✅ DynamoDB connection successful');
+        } else {
+          console.log('⚠️  DynamoDB connection failed, but continuing...');
+        }
+      } else {
+        console.log('🔧 Development mode: Skipping DynamoDB connection check');
+      }
+
+      this.app.listen(this.port, () => {
+        console.log(`✅ Booking Service is running on port ${this.port}`);
+        console.log(`📍 Health check: http://localhost:${this.port}/health`);
+      });
+    } catch (error) {
+      console.error('❌ Failed to start Booking Service:', error);
+      throw error;
+    }
   }
 
   public getApp(): express.Application {
