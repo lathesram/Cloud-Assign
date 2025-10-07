@@ -1,0 +1,94 @@
+# CloudFormation Template for SkillBridge Messaging Service DynamoDB Tables
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'DynamoDB tables for SkillBridge Messaging Service'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: college
+    Description: Environment name for college assignment
+    AllowedValues: [college, dev]
+  
+  ProjectName:
+    Type: String
+    Default: skillbridge
+    Description: Project name for resource naming
+
+Resources:
+  # Messages Table
+  MessagesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${ProjectName}-messages-${Environment}'
+      AttributeDefinitions:
+        - AttributeName: conversationId
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: conversationId
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Service
+          Value: messaging
+
+  # Conversations Table
+  ConversationsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${ProjectName}-conversations-${Environment}'
+      AttributeDefinitions:
+        - AttributeName: conversationId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: conversationId
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Service
+          Value: messaging
+
+Outputs:
+  MessagesTableName:
+    Description: Name of the Messages DynamoDB table
+    Value: !Ref MessagesTable
+    Export:
+      Name: !Sub '${AWS::StackName}-MessagesTableName'
+
+  MessagesTableArn:
+    Description: ARN of the Messages DynamoDB table
+    Value: !GetAtt MessagesTable.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-MessagesTableArn'
+
+  ConversationsTableName:
+    Description: Name of the Conversations DynamoDB table
+    Value: !Ref ConversationsTable
+    Export:
+      Name: !Sub '${AWS::StackName}-ConversationsTableName'
+
+  ConversationsTableArn:
+    Description: ARN of the Conversations DynamoDB table
+    Value: !GetAtt ConversationsTable.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-ConversationsTableArn'
