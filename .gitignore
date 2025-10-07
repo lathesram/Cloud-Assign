@@ -123,7 +123,8 @@ temp/
 # AWS Credentials (if accidentally placed in project)
 .aws/
 credentials
-config
+# AWS config files only (not service config folders)
+.aws/config
 
 # Backup Files
 *.bak
