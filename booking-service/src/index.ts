@@ -1,3 +1,4 @@
+console.log('Starting booking service...');
 import { Server } from './server';
 
 // Start the booking service

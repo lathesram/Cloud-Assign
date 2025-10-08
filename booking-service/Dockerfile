@@ -1,4 +1,4 @@
-# Multi-stage build for production optimization
+# Builder stage for TypeScript compilation
 FROM node:18-alpine AS builder
 
 WORKDIR /app
@@ -7,8 +7,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install ALL dependencies (including dev) for building
+RUN npm ci
 
 # Copy source code
 COPY src/ ./src/
@@ -29,7 +29,7 @@ RUN adduser -S nextjs -u 1001
 COPY package*.json ./
 
 # Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --omit=dev && npm cache clean --force
 
 # Copy built application from builder stage
 COPY --from=builder --chown=nextjs:nodejs /app/dist ./dist
@@ -39,10 +39,6 @@ USER nextjs
 
 # Expose port
 EXPOSE 3002
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node --version || exit 1
 
 # Start the application
 CMD ["node", "dist/index.js"]

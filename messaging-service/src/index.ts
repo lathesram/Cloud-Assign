@@ -1,3 +1,4 @@
+console.log('Starting messaging service...');
 import { MessagingServer } from './server';
 
 const server = new MessagingServer();
