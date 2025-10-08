@@ -1,0 +1,143 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-service
+  namespace: skillbridge
+  labels:
+    app: booking-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking-service
+  template:
+    metadata:
+      labels:
+        app: booking-service
+    spec:
+      containers:
+      - name: booking-service
+        image: skillbridge/booking-service:latest
+        ports:
+        - containerPort: 3002
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: skillbridge-config
+              key: NODE_ENV
+        - name: PORT
+          value: "3002"
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: skillbridge-config
+              key: AWS_REGION
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: skillbridge-secrets
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: skillbridge-secrets
+              key: AWS_SECRET_ACCESS_KEY
+        - name: DYNAMODB_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: skillbridge-config
+              key: DYNAMODB_ENDPOINT
+        - name: DYNAMODB_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: skillbridge-config
+              key: DYNAMODB_REGION
+        - name: DYNAMODB_TABLE_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: skillbridge-config
+              key: DYNAMODB_TABLE_PREFIX
+        - name: DYNAMODB_TABLE_BOOKINGS
+          value: "skillbridge-bookings-college"
+        - name: BOOKINGS_TABLE_NAME
+          value: "skillbridge-bookings-college"
+        - name: AUTH_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: skillbridge-config
+              key: AUTH_SERVICE_URL
+        - name: USER_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: skillbridge-config
+              key: USER_SERVICE_URL
+        - name: AUTH_SERVICE_HEALTH_URL
+          valueFrom:
+            configMapKeyRef:
+              name: skillbridge-config
+              key: AUTH_SERVICE_HEALTH_URL
+        - name: USER_SERVICE_HEALTH_URL
+          valueFrom:
+            configMapKeyRef:
+              name: skillbridge-config
+              key: USER_SERVICE_HEALTH_URL
+        - name: CORS_ORIGIN
+          valueFrom:
+            configMapKeyRef:
+              name: skillbridge-config
+              key: CORS_ORIGIN
+        - name: CORS_CREDENTIALS
+          valueFrom:
+            configMapKeyRef:
+              name: skillbridge-config
+              key: CORS_CREDENTIALS
+        - name: RATE_LIMIT_WINDOW
+          valueFrom:
+            configMapKeyRef:
+              name: skillbridge-config
+              key: RATE_LIMIT_WINDOW
+        - name: RATE_LIMIT_MAX
+          value: "200"
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: skillbridge-config
+              key: LOG_LEVEL
+        - name: LOG_FORMAT
+          valueFrom:
+            configMapKeyRef:
+              name: skillbridge-config
+              key: LOG_FORMAT
+        - name: HEALTH_CHECK_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: skillbridge-config
+              key: HEALTH_CHECK_ENDPOINT
+        - name: DEFAULT_BOOKING_DURATION
+          value: "60"
+        - name: MAX_ADVANCE_BOOKING_DAYS
+          value: "30"
+        - name: MIN_ADVANCE_BOOKING_HOURS
+          value: "2"
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: booking-service
+  namespace: skillbridge
+  labels:
+    app: booking-service
+spec:
+  selector:
+    app: booking-service
+  ports:
+  - name: http
+    port: 3002
+    targetPort: 3002
+    protocol: TCP
+  type: ClusterIP
