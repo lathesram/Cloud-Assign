@@ -14,7 +14,7 @@ export class Server {
 
   constructor() {
     this.app = express();
-    this.port = parseInt(process.env.PORT || '3003', 10);
+    this.port = parseInt(process.env.PORT || '3002', 10);
     this.setupMiddlewares();
     this.setupRoutes();
     this.setupErrorHandling();
