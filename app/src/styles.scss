@@ -1,1 +1,134 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+html, body { 
+  height: 100%; 
+}
+
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif; 
+  background-color: #fafafa;
+}
+
+.container-fluid {
+  padding: 0 20px;
+}
+
+.content-area {
+  padding: 20px;
+}
+:root {
+  --primary-color: #3f51b5;
+  --accent-color: #e91e63;
+  --warn-color: #f44336;
+  --background-color: #fafafa;
+  --surface-color: #ffffff;
+  --text-primary: rgba(0, 0, 0, 0.87);
+  --text-secondary: rgba(0, 0, 0, 0.54);
+}
+
+.mat-elevation-z1 {
+  box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),
+              0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+              0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+}
+
+.mat-elevation-z2 {
+  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+              0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+              0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  
+  &:hover {
+    background-color: #303f9f;
+    border-color: #303f9f;
+  }
+}
+
+.btn-accent {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  
+  &:hover {
+    background-color: #c2185b;
+    border-color: #c2185b;
+  }
+}
+
+.success-snackbar {
+  --mdc-snackbar-container-color: #4caf50;
+  --mat-snack-bar-button-color: #fff;
+  --mdc-snackbar-supporting-text-color: #fff;
+}
+
+.error-snackbar {
+  --mdc-snackbar-container-color: #f44336;
+  --mat-snack-bar-button-color: #fff;
+  --mdc-snackbar-supporting-text-color: #fff;
+}
+
+.warning-snackbar {
+  --mdc-snackbar-container-color: #ff9800;
+  --mat-snack-bar-button-color: #fff;
+  --mdc-snackbar-supporting-text-color: #fff;
+}
+
+.info-snackbar {
+  --mdc-snackbar-container-color: #2196f3;
+  --mat-snack-bar-button-color: #fff;
+  --mdc-snackbar-supporting-text-color: #fff;
+}
+
+* {
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.mat-mdc-form-field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.mat-mdc-table {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mat-mdc-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 0 15px;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  h2 {
+    font-size: 1.25rem;
+  }
+  
+  .mat-mdc-card-header .mat-mdc-card-title {
+    font-size: 1.1rem;
+  }
+}
