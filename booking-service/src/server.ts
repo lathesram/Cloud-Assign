@@ -5,7 +5,6 @@ import dotenv from 'dotenv';
 import bookingRoutes from './api/routes/booking.routes';
 import { checkDynamoDBConnection } from './config/dynamodb';
 
-// Load environment variables
 dotenv.config();
 
 export class Server {
@@ -43,7 +42,7 @@ export class Server {
     try {
       console.log('🚀 Starting Booking Service...');
       
-      // Skip DynamoDB connection check in development
+
       if (process.env.NODE_ENV !== 'development') {
         console.log('📊 Checking DynamoDB connection...');
         const dbConnected = await checkDynamoDBConnection();

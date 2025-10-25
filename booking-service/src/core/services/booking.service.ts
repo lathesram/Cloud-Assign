@@ -88,7 +88,7 @@ export class BookingService {
 
   async updateBooking(bookingId: string, updates: UpdateBookingRequest): Promise<{ success: boolean; booking?: Booking; message: string }> {
     try {
-      // First get the existing booking
+
       const existingBooking = await this.getBookingById(bookingId);
       if (!existingBooking) {
         return {
@@ -97,14 +97,14 @@ export class BookingService {
         };
       }
 
-      // Create updated booking object
+
       const updatedBooking: Booking = {
         ...existingBooking,
         ...updates,
         updatedAt: new Date().toISOString()
       };
 
-      // Put the updated booking back (this works regardless of key structure)
+
       await dynamodb.send(new PutCommand({
         TableName: TABLES.BOOKINGS,
         Item: updatedBooking

@@ -88,7 +88,7 @@ export class AuthService {
         };
       }
 
-      // Verify password
+
       const isValidPassword = await PasswordUtils.comparePassword(
         credentials.password,
         user.passwordHash

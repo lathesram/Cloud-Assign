@@ -4,7 +4,7 @@ import Joi from 'joi';
 
 const userService = new UserService();
 
-// Validation schemas
+
 const createUserSchema = Joi.object({
   email: Joi.string().email().required(),
   name: Joi.string().min(2).max(100).required(),
@@ -114,7 +114,7 @@ export class UserController {
         return;
       }
       
-      // Check if user owns this profile or is authorized
+
       if (req.user && req.user.userId !== id) {
         res.status(403).json({
           success: false,
@@ -205,7 +205,7 @@ export class UserController {
   }
 }
 
-// Extend Request interface to include user from auth middleware
+
 declare global {
   namespace Express {
     interface Request {

@@ -5,7 +5,6 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import userRoutes from './api/routes/user.routes';
 
-// Load environment variables
 dotenv.config();
 
 export class Server {
@@ -21,7 +20,7 @@ export class Server {
   }
 
   private setupMiddlewares(): void {
-    // Security middleware
+
     this.app.use(helmet({
       contentSecurityPolicy: {
         directives: {
@@ -33,7 +32,7 @@ export class Server {
       },
     }));
 
-    // CORS configuration
+
     this.app.use(cors({
       origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
       credentials: true,
@@ -41,16 +40,16 @@ export class Server {
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     }));
 
-    // Request logging
+
     this.app.use(morgan('combined'));
 
-    // Body parsing middleware
+
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   }
 
   private setupRoutes(): void {
-    // Health check endpoint
+
     this.app.get('/health', (req, res) => {
       res.status(200).json({
         success: true,
@@ -60,10 +59,10 @@ export class Server {
       });
     });
 
-    // API routes
+
     this.app.use('/api/users', userRoutes);
 
-    // 404 handler
+
     this.app.use('*', (req, res) => {
       res.status(404).json({
         success: false,
@@ -74,7 +73,7 @@ export class Server {
   }
 
   private setupErrorHandling(): void {
-    // Global error handler
+
     this.app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
       console.error('Error:', err.message);
       console.error('Stack:', err.stack);

@@ -43,10 +43,6 @@ export class BookingController {
     }
   }
 
-  /**
-   * Get booking by ID
-   * GET /bookings/:id
-   */
   async getBookingById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
@@ -81,10 +77,6 @@ export class BookingController {
     }
   }
 
-  /**
-   * Get all user bookings (both as mentor and mentee)
-   * GET /bookings/user/:userId
-   */
   async getUserBookings(req: Request, res: Response): Promise<void> {
     try {
       const { userId } = req.params;
@@ -108,10 +100,7 @@ export class BookingController {
     }
   }
 
-  /**
-   * Update booking (accept/decline)
-   * PUT /bookings/:id
-   */
+
   async updateBooking(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;

@@ -16,7 +16,7 @@ export class UserService {
    */
   async createUser(userData: CreateUserRequest): Promise<{ success: boolean; user?: UserProfile; message?: string }> {
     try {
-      // Check if user already exists
+
       const existingUser = await this.getUserByEmail(userData.email);
       if (existingUser) {
         return {
@@ -25,7 +25,7 @@ export class UserService {
         };
       }
 
-      // Create user object
+
       const userId = uuidv4();
       const now = new Date().toISOString();
       
@@ -50,7 +50,7 @@ export class UserService {
         totalSessions: 0
       };
 
-      // Save user to DynamoDB
+
       await dynamodb.send(new PutCommand({
         TableName: TABLES.USERS,
         Item: user,
@@ -119,7 +119,7 @@ export class UserService {
    */
   async updateUser(userId: string, updateData: UpdateUserRequest): Promise<{ success: boolean; user?: UserProfile; message?: string }> {
     try {
-      // Check if user exists
+
       const existingUser = await this.getUserById(userId);
       if (!existingUser) {
         return {
@@ -128,7 +128,7 @@ export class UserService {
         };
       }
 
-      // Build update expression
+
       const updateExpression: string[] = [];
       const expressionAttributeNames: { [key: string]: string } = {};
       const expressionAttributeValues: { [key: string]: any } = {};
@@ -184,7 +184,7 @@ export class UserService {
         expressionAttributeValues[':githubProfile'] = updateData.githubProfile;
       }
 
-      // Always update the updatedAt field
+
       updateExpression.push('updatedAt = :updatedAt');
       expressionAttributeValues[':updatedAt'] = new Date().toISOString();
 
@@ -195,7 +195,7 @@ export class UserService {
         };
       }
 
-      // Update user in DynamoDB
+
       const updateParams: any = {
         TableName: TABLES.USERS,
         Key: { userId },
@@ -240,7 +240,7 @@ export class UserService {
         limit = 10
       } = searchParams;
 
-      // Build filter expression
+
       const filterExpressions: string[] = [];
       const expressionAttributeValues: { [key: string]: any } = {};
 
@@ -269,7 +269,7 @@ export class UserService {
         expressionAttributeValues[':maxHourlyRate'] = maxHourlyRate;
       }
 
-      // Add active filter
+
       filterExpressions.push('isActive = :isActive');
       expressionAttributeValues[':isActive'] = true;
 
@@ -286,7 +286,7 @@ export class UserService {
       const result = await dynamodb.send(new ScanCommand(params));
       let users = result.Items as User[] || [];
 
-      // Filter by skills if provided
+
       if (skills && skills.length > 0) {
         users = users.filter(user => 
           user.skills && skills.some(skill => 
@@ -297,7 +297,7 @@ export class UserService {
         );
       }
 
-      // Pagination
+
       const total = users.length;
       const totalPages = Math.ceil(total / limit);
       const startIndex = (page - 1) * limit;

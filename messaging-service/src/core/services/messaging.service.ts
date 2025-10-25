@@ -5,17 +5,11 @@ import { Message, Conversation, SendMessageRequest } from '../../models/message.
 
 export class MessagingService {
 
-  /**
-   * Generate conversation ID from two user IDs (always sorted for consistency)
-   */
   private generateConversationId(userId1: string, userId2: string): string {
     const sortedIds = [userId1, userId2].sort();
     return `conv_${sortedIds[0]}_${sortedIds[1]}`;
   }
 
-  /**
-   * Send a new message
-   */
   async sendMessage(senderId: string, messageRequest: SendMessageRequest): Promise<Message> {
     const messageId = uuidv4();
     const timestamp = new Date().toISOString();
@@ -33,7 +27,6 @@ export class MessagingService {
     };
 
     try {
-
       await dynamodb.send(new PutCommand({
         TableName: TABLES.MESSAGES,
         Item: message
@@ -43,14 +36,10 @@ export class MessagingService {
 
       return message;
     } catch (error) {
-
       throw new Error('Failed to send message');
     }
   }
 
-  /**
-   * Get conversation messages with pagination
-   */
   async getConversationMessages(
     userId1: string, 
     userId2: string, 
@@ -76,17 +65,12 @@ export class MessagingService {
         lastEvaluatedKey: result.LastEvaluatedKey
       };
     } catch (error) {
-
       throw new Error('Failed to retrieve messages');
     }
   }
 
-  /**
-   * Mark messages as read
-   */
   async markMessagesAsRead(conversationId: string, userId: string): Promise<void> {
     try {
-
       const result = await dynamodb.send(new QueryCommand({
         TableName: TABLES.MESSAGES,
         KeyConditionExpression: 'conversationId = :conversationId',
@@ -114,14 +98,10 @@ export class MessagingService {
 
       await Promise.all(updatePromises);
     } catch (error) {
-
       throw new Error('Failed to mark messages as read');
     }
   }
 
-  /**
-   * Get user conversations
-   */
   async getUserConversations(userId: string): Promise<Conversation[]> {
     try {
       const result = await dynamodb.send(new QueryCommand({
@@ -134,14 +114,10 @@ export class MessagingService {
 
       return (result.Items as Conversation[]) || [];
     } catch (error) {
-
       throw new Error('Failed to retrieve conversations');
     }
   }
 
-  /**
-   * Update or create conversation
-   */
   private async updateConversation(
     conversationId: string, 
     participants: string[], 
@@ -164,7 +140,6 @@ export class MessagingService {
         ConditionExpression: 'attribute_not_exists(conversationId)'
       }));
     } catch (error: any) {
-
       if (error.name === 'ConditionalCheckFailedException') {
         await dynamodb.send(new UpdateCommand({
           TableName: TABLES.CONVERSATIONS,

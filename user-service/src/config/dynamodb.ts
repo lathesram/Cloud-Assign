@@ -10,7 +10,7 @@ export const BOOKINGS_TABLE = process.env.BOOKINGS_TABLE_NAME || 'skillbridge-bo
 export const MESSAGES_TABLE = process.env.MESSAGES_TABLE_NAME || 'skillbridge-messages-college';
 export const CODE_REVIEWS_TABLE = process.env.CODE_REVIEWS_TABLE_NAME || 'skillbridge-code-reviews-college';
 
-// GSI names
+
 export const USER_EMAIL_GSI = process.env.USER_EMAIL_GSI_NAME || 'email-index';
 export const USER_TYPE_GSI = process.env.USER_TYPE_GSI_NAME || 'type-index';
 export const USER_DOMAIN_GSI = process.env.USER_DOMAIN_GSI_NAME || 'domain-index';

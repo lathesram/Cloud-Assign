@@ -12,7 +12,7 @@ export class CodeReviewService {
     reviewData: CreateReviewRequest
   ): Promise<CodeReview> {
     try {
-      console.log('📤 Uploading file and creating review:', { filename: file.originalname, menteeId: reviewData.menteeId });
+
       const reviewId = uuidv4();
       const s3Key = generateS3Key(reviewId, file.originalname);
       
@@ -55,7 +55,7 @@ export class CodeReviewService {
 
   async getReviewById(reviewId: string): Promise<CodeReview | null> {
     try {
-      console.log('🔍 Getting review by ID:', reviewId);
+
       const result = await ddbDocClient.send(new GetCommand({
         TableName: CODE_REVIEWS_TABLE,
         Key: { reviewId }
@@ -73,7 +73,7 @@ export class CodeReviewService {
     newAnnotations: Omit<Annotation, 'annotationId' | 'mentorId' | 'createdAt'>[]
   ): Promise<CodeReview | null> {
     try {
-      console.log('📝 Adding annotations to review:', { reviewId, mentorId, annotationCount: newAnnotations.length });
+
       const currentReview = await this.getReviewById(reviewId);
       if (!currentReview) return null;
 

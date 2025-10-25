@@ -34,7 +34,6 @@ try {
   });
 
 } catch (error) {
-
   throw new Error('DynamoDB AWS client initialization failed');
 }
 

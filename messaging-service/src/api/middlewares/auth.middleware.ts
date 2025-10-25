@@ -58,7 +58,6 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         next();
         return;
       } catch (jwtError) {
-
       }
     }
 
@@ -67,7 +66,6 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
       message: authResult.message || 'Invalid or expired token'
     });
   } catch (error) {
-
     res.status(500).json({
       success: false,
       message: 'Authentication service error'

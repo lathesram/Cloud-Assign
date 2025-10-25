@@ -121,7 +121,6 @@ export class MessagingController {
 
       res.json(result);
     } catch (error) {
-
       res.status(500).json({ error: 'Failed to retrieve messages' });
     }
   }
@@ -138,7 +137,6 @@ export class MessagingController {
       const conversations = await this.messagingService.getUserConversations(userId);
       res.json({ conversations });
     } catch (error) {
-
       res.status(500).json({ error: 'Failed to retrieve conversations' });
     }
   }
@@ -170,7 +168,6 @@ export class MessagingController {
 
       res.json({ success: true, message });
     } catch (error) {
-
       res.status(500).json({ error: 'Failed to send message' });
     }
   }
@@ -190,7 +187,6 @@ export class MessagingController {
 
       res.json({ success: true });
     } catch (error) {
-
       res.status(500).json({ error: 'Failed to mark messages as read' });
     }
   }
