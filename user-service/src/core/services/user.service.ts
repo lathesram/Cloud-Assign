@@ -38,7 +38,8 @@ export class UserService {
         seniority: userData.seniority,
         bio: userData.bio,
         skills: userData.skills || [],
-        hourlyRate: userData.hourlyRate,
+        hourlyRate: userData.hourlyRate === null ? undefined : userData.hourlyRate,
+        experience: userData.experience ? (typeof userData.experience === 'string' ? parseInt(userData.experience) : userData.experience) : undefined,
         availability: userData.timezone ? {
           timezone: userData.timezone,
           slots: []
@@ -161,7 +162,12 @@ export class UserService {
 
       if (updateData.hourlyRate !== undefined) {
         updateExpression.push('hourlyRate = :hourlyRate');
-        expressionAttributeValues[':hourlyRate'] = updateData.hourlyRate;
+        expressionAttributeValues[':hourlyRate'] = updateData.hourlyRate === null ? undefined : updateData.hourlyRate;
+      }
+
+      if (updateData.experience !== undefined) {
+        updateExpression.push('experience = :experience');
+        expressionAttributeValues[':experience'] = typeof updateData.experience === 'string' ? parseInt(updateData.experience) : updateData.experience;
       }
 
       if (updateData.availability !== undefined) {

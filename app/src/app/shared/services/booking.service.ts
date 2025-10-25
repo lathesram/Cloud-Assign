@@ -13,6 +13,7 @@ import {
   PaginationParams
 } from '../models';
 import { BaseHttpService } from './base-http.service';
+import { AuthService } from './auth.service';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -21,7 +22,10 @@ import { environment } from '../../../environments/environment';
 export class BookingService extends BaseHttpService {
   protected baseUrl = `${environment.services.bookingService}/api/bookings`;
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {
     super();
   }
 
@@ -54,7 +58,17 @@ export class BookingService extends BaseHttpService {
   }
 
   createBooking(bookingData: CreateBookingRequest): Observable<Booking> {
-    return this.http.post<ApiResponse<Booking>>(this.baseUrl, bookingData)
+    const menteeId = this.authService.getCurrentUserId();
+    if (!menteeId) {
+      throw new Error('User must be logged in to create a booking');
+    }
+
+    const requestData = {
+      ...bookingData,
+      menteeId
+    };
+
+    return this.http.post<ApiResponse<Booking>>(this.baseUrl, requestData)
       .pipe(
         map(response => this.handleResponse<Booking>(response)),
         catchError(this.handleError)

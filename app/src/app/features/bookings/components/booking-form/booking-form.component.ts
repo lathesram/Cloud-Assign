@@ -11,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { BookingService } from '../../../../shared/services/booking.service';
+import { BookingService, AuthService } from '../../../../shared/services';
 import { UserService } from '../../../../shared/services/user.service';
 import { Booking, CreateBookingRequest, UpdateBookingRequest } from '../../../../shared/models/booking.model';
 import { User } from '../../../../shared/models/user.model';
@@ -36,15 +36,14 @@ import { CustomValidators } from '../../../../shared/utils/custom-validators';
     RouterLink
   ],
   template: `
-    <div class="container-fluid py-4">
-      <div class="row justify-content-center">
-        <div class="col-lg-8">
-          <mat-card>
-            <mat-card-header>
-              <mat-card-title>{{ isEditMode ? 'Edit Booking' : 'Create New Booking' }}</mat-card-title>
-              <mat-card-subtitle>{{ isEditMode ? 'Update booking details' : 'Schedule a mentoring session' }}</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
+    <div class="main-container">
+      <div class="page-header">
+        <h1 class="page-title">{{ isEditMode ? 'Edit Booking' : 'Create New Booking' }}</h1>
+        <p class="page-subtitle">{{ isEditMode ? 'Update session details and schedule' : 'Schedule a personalized mentoring session' }}</p>
+      </div>
+      
+      <div class="form-container">
+        <div class="content-card">
               @if (loading) {
                 <div class="text-center py-4">
                   <mat-spinner></mat-spinner>
@@ -150,7 +149,7 @@ import { CustomValidators } from '../../../../shared/utils/custom-validators';
                   }
 
                   <div class="d-flex gap-2">
-                    <button mat-raised-button color="primary" type="submit" [disabled]="bookingForm.invalid || submitting">
+                    <button mat-raised-button type="submit" [disabled]="bookingForm.invalid || submitting">
                       @if (submitting) {
                         <mat-spinner diameter="20" class="me-2"></mat-spinner>
                       }
@@ -162,15 +161,207 @@ import { CustomValidators } from '../../../../shared/utils/custom-validators';
                   </div>
                 </form>
               }
-            </mat-card-content>
-          </mat-card>
         </div>
       </div>
     </div>
   `,
   styles: `
-    mat-form-field {
+    .main-container {
+      min-height: 100vh;
+      background: #ffffff;
+      padding: 2rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding: 2rem 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #333333;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      font-size: 1rem;
+      color: #666666;
+      margin: 0;
+    }
+
+    .form-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .content-card {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2.5rem;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -0.75rem;
+    }
+
+    .col-md-6 {
+      flex: 0 0 50%;
+      max-width: 50%;
+      padding: 0 0.75rem;
+    }
+
+    .mb-3 {
+      margin-bottom: 1.5rem;
+    }
+
+    .mb-4 {
+      margin-bottom: 2rem;
+    }
+
+    .w-100 {
+      width: 100%;
+    }
+
+    ::ng-deep mat-form-field {
+      width: 100%;
       margin-bottom: 0;
+    }
+
+    ::ng-deep .mat-mdc-form-field {
+      background: transparent;
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-floating-label {
+      color: rgba(255,255,255,0.8);
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-input-element {
+      color: white;
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-input-element::placeholder {
+      color: rgba(255,255,255,0.6);
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-text-field-wrapper {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    ::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+      color: white;
+    }
+
+    ::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-notched-outline {
+      display: none;
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-notched-outline-leading,
+    ::ng-deep .mat-mdc-form-field .mat-mdc-notched-outline-trailing,
+    ::ng-deep .mat-mdc-form-field .mat-mdc-notched-outline-notch {
+      border: none;
+    }
+
+    ::ng-deep .mat-mdc-select-arrow {
+      color: rgba(255,255,255,0.8);
+    }
+
+    ::ng-deep .mat-datepicker-toggle {
+      color: rgba(255,255,255,0.8);
+    }
+
+    .d-flex {
+      display: flex;
+    }
+
+    .gap-2 {
+      gap: 1rem;
+    }
+
+    ::ng-deep .mat-mdc-raised-button {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border-radius: 12px;
+      padding: 0.75rem 2rem;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+
+    ::ng-deep .mat-mdc-raised-button:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+
+    ::ng-deep .mat-mdc-outlined-button {
+      color: white;
+      border-color: rgba(255,255,255,0.3);
+      border-radius: 12px;
+      padding: 0.75rem 2rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    ::ng-deep .mat-mdc-outlined-button:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.5);
+    }
+
+    ::ng-deep .mat-mdc-progress-spinner circle {
+      stroke: white;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .py-4 {
+      padding: 2rem 0;
+    }
+
+    .me-2 {
+      margin-right: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 1rem;
+      }
+
+      .page-title {
+        font-size: 2rem;
+      }
+
+      .content-card {
+        padding: 1.5rem;
+      }
+
+      .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+
+      .d-flex {
+        flex-direction: column;
+      }
+
+      .gap-2 {
+        gap: 0.5rem;
+      }
     }
   `
 })
@@ -188,7 +379,8 @@ export class BookingFormComponent implements OnInit {
     private router: Router,
     private bookingService: BookingService,
     private userService: UserService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private authService: AuthService
   ) {
     this.bookingForm = this.fb.group({
       sessionTitle: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
@@ -215,12 +407,14 @@ export class BookingFormComponent implements OnInit {
   }
 
   loadMentors(): void {
-    this.userService.getUsers().subscribe({
+    // Use the dedicated getMentors method to fetch only mentors from user service
+    this.userService.getMentors({ page: 1, limit: 100 }).subscribe({
       next: (response) => {
-        this.mentors = response.data.filter(user => user.type === 'mentor');
+        this.mentors = response.data;
       },
       error: (error) => {
         console.error('Error loading mentors:', error);
+        this.notificationService.showError('Failed to load mentors. Please refresh the page.');
       }
     });
   }

@@ -33,8 +33,10 @@ export class MessagingServer {
     this.app.use(morgan('combined'));
 
     this.app.use(cors({
-      origin: true,
-      credentials: true
+      origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:4200'],
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     }));
 
     this.app.use(express.json());

@@ -20,15 +20,28 @@ export class Server {
   }
 
   private setupMiddlewares(): void {
-    this.app.use(helmet());
-    this.app.use(cors());
-    this.app.use(express.json());
+    // Enable CORS for all origins during development
+    this.app.use(cors({
+      origin: '*',  // Allow all origins for development
+      credentials: false,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
+    }));
+    
+    this.app.use(helmet({
+      crossOriginEmbedderPolicy: false,
+      contentSecurityPolicy: false
+    }));
+    
+    this.app.use(express.json({ limit: '10mb' }));
+    this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   }
 
   private setupRoutes(): void {
     this.app.get('/health', (req, res) => {
       res.status(200).json({ success: true, message: 'Booking service is healthy' });
     });
+    
     this.app.use('/api/bookings', bookingRoutes);
   }
 

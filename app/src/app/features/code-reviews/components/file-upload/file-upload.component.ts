@@ -153,8 +153,8 @@ export interface FileUploadResult {
       }
 
       &.has-file {
-        border-color: #4caf50;
-        background-color: #f3e5f5;
+        border-color: rgba(255, 255, 255, 0.6);
+        background-color: rgba(255, 255, 255, 0.1);
       }
     }
 
@@ -201,7 +201,7 @@ export interface FileUploadResult {
         font-size: 48px;
         width: 48px;
         height: 48px;
-        color: #4caf50;
+        color: rgba(255, 255, 255, 0.8);
       }
 
       .file-details {

@@ -33,15 +33,14 @@ import { FileUploadComponent, FileUploadResult } from '../file-upload/file-uploa
     FileUploadComponent
   ],
   template: `
-    <div class="container-fluid py-4">
-      <div class="row justify-content-center">
-        <div class="col-lg-8">
-          <mat-card>
-            <mat-card-header>
-              <mat-card-title>Request Code Review</mat-card-title>
-              <mat-card-subtitle>Submit your code for expert feedback and improvement suggestions</mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>
+    <div class="main-container">
+      <div class="page-header">
+        <h1 class="page-title">Request Code Review</h1>
+        <p class="page-subtitle">Submit your code for expert feedback and improvement suggestions</p>
+      </div>
+      
+      <div class="form-container">
+        <div class="content-card">
               <mat-stepper #stepper linear>
                 <!-- Step 1: Basic Information -->
                 <mat-step [stepControl]="basicInfoForm" label="Basic Information">
@@ -106,7 +105,7 @@ import { FileUploadComponent, FileUploadResult } from '../file-upload/file-uploa
                     </div>
                     
                     <div class="step-actions">
-                      <button mat-raised-button color="primary" matStepperNext [disabled]="!basicInfoForm.valid">
+                      <button mat-raised-button matStepperNext [disabled]="!basicInfoForm.valid">
                         Next: Upload File
                         <mat-icon>navigate_next</mat-icon>
                       </button>
@@ -129,7 +128,6 @@ import { FileUploadComponent, FileUploadResult } from '../file-upload/file-uploa
                       </button>
                       <button 
                         mat-raised-button 
-                        color="primary" 
                         matStepperNext 
                         [disabled]="!uploadedFile"
                       >
@@ -192,7 +190,6 @@ import { FileUploadComponent, FileUploadResult } from '../file-upload/file-uploa
                       @if (submitting) {
                         <button 
                           mat-raised-button 
-                          color="primary" 
                           disabled
                           (click)="submitReview()"
                         >
@@ -202,7 +199,6 @@ import { FileUploadComponent, FileUploadResult } from '../file-upload/file-uploa
                       } @else {
                         <button 
                           mat-raised-button 
-                          color="primary" 
                           (click)="submitReview()"
                         >
                           <mat-icon>send</mat-icon>
@@ -213,20 +209,208 @@ import { FileUploadComponent, FileUploadResult } from '../file-upload/file-uploa
                   </div>
                 </mat-step>
               </mat-stepper>
-            </mat-card-content>
-          </mat-card>
         </div>
       </div>
     </div>
   `,
   styles: `
+    .main-container {
+      min-height: 100vh;
+      background: #ffffff;
+      padding: 2rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding: 2rem 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #333333;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      font-size: 1rem;
+      color: #666666;
+      margin: 0;
+    }
+
+    .form-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .content-card {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2.5rem;
+    }
+
+    ::ng-deep .mat-stepper-horizontal {
+      background: transparent;
+    }
+
+    ::ng-deep .mat-step-header {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: white;
+      margin: 0 0.5rem;
+    }
+
+    ::ng-deep .mat-step-header.cdk-keyboard-focused {
+      background: rgba(255,255,255,0.2);
+    }
+
+    ::ng-deep .mat-step-header:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    ::ng-deep .mat-step-label {
+      color: white;
+      font-weight: 500;
+    }
+
+    ::ng-deep .mat-step-icon {
+      background-color: rgba(255,255,255,0.2);
+      color: white;
+    }
+
+    ::ng-deep .mat-step-icon-selected {
+      background-color: rgba(255,255,255,0.3);
+      color: white;
+    }
+
+    ::ng-deep .mat-stepper-horizontal-line {
+      border-top-color: rgba(255,255,255,0.3);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -0.75rem;
+    }
+
+    .col-12, .col-md-6 {
+      padding: 0 0.75rem;
+    }
+
+    .col-12 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+
+    .col-md-6 {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+
+    .w-100 {
+      width: 100%;
+    }
+
+    .mt-3 {
+      margin-top: 1.5rem;
+    }
+
+    ::ng-deep mat-form-field {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    ::ng-deep .mat-mdc-form-field {
+      background: transparent;
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-floating-label {
+      color: rgba(255,255,255,0.8);
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-input-element {
+      color: white;
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-input-element::placeholder {
+      color: rgba(255,255,255,0.6);
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-text-field-wrapper {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    ::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+      color: white;
+    }
+
+    ::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-notched-outline {
+      display: none;
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-notched-outline-leading,
+    ::ng-deep .mat-mdc-form-field .mat-mdc-notched-outline-trailing,
+    ::ng-deep .mat-mdc-form-field .mat-mdc-notched-outline-notch {
+      border: none;
+    }
+
+    ::ng-deep .mat-mdc-select-arrow {
+      color: rgba(255,255,255,0.8);
+    }
+
+    ::ng-deep .mat-mdc-select-value {
+      color: white !important;
+    }
+
+    ::ng-deep .mat-mdc-select-placeholder {
+      color: rgba(255,255,255,0.6) !important;
+    }
+
+    ::ng-deep .mat-mdc-select-value-text {
+      color: white !important;
+    }
+
+    ::ng-deep .mat-icon {
+      color: rgba(255,255,255,0.8);
+    }
+
+    ::ng-deep .mat-mdc-select-panel {
+      background: rgba(255, 255, 255, 0.95) !important;
+      backdrop-filter: blur(20px);
+      border-radius: 12px !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    ::ng-deep .mat-mdc-option {
+      color: #333 !important;
+    }
+
+    ::ng-deep .mat-mdc-option:hover {
+      background: rgba(102, 126, 234, 0.1) !important;
+    }
+
+    ::ng-deep .mat-mdc-option.mdc-list-item--selected {
+      background: rgba(102, 126, 234, 0.2) !important;
+    }
+
     .step-actions {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-top: 24px;
       padding-top: 16px;
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid rgba(255,255,255,0.2);
     }
 
     .step-actions button {
@@ -235,17 +419,54 @@ import { FileUploadComponent, FileUploadResult } from '../file-upload/file-uploa
       gap: 8px;
     }
 
+    ::ng-deep .mat-mdc-raised-button {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border-radius: 12px;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+
+    ::ng-deep .mat-mdc-raised-button:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+
+    ::ng-deep .mat-mdc-outlined-button {
+      color: white;
+      border-color: rgba(255,255,255,0.3);
+      border-radius: 12px;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    ::ng-deep .mat-mdc-outlined-button:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.5);
+    }
+
     .review-summary {
       .summary-section {
         margin-bottom: 24px;
         padding: 16px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.2);
         
         h4 {
           margin: 0 0 12px 0;
-          color: #333;
-          font-weight: 500;
+          color: white;
+          font-weight: 600;
+        }
+
+        p {
+          color: rgba(255,255,255,0.9);
+          margin: 0;
         }
       }
 
@@ -271,7 +492,7 @@ import { FileUploadComponent, FileUploadResult } from '../file-upload/file-uploa
         gap: 12px;
         
         mat-icon {
-          color: #4caf50;
+          color: rgba(255, 255, 255, 0.8);
         }
         
         .file-details {
@@ -352,15 +573,11 @@ export class ReviewFormComponent implements OnInit {
 
     const reviewData = {
       ...this.basicInfoForm.value,
-      fileName: this.uploadedFile.fileName,
-      fileSize: this.uploadedFile.fileSize,
       // Mock mentee ID - in real app, get from auth service
-      menteeId: 'current-user-id',
-      s3FileUrl: '', // This would be set after actual file upload to S3
-      status: 'pending'
+      menteeId: 'current-user-id'
     };
 
-    this.codeReviewService.createCodeReview(reviewData).subscribe({
+    this.codeReviewService.uploadFile(this.uploadedFile.file, reviewData).subscribe({
       next: (review: any) => {
         this.submitting = false;
         this.snackBar.open('Review request submitted successfully!', 'Close', { duration: 3000 });

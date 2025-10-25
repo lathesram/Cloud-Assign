@@ -3,7 +3,7 @@ export interface Booking {
   mentorId: string;       // Sort Key  
   menteeId: string;
   timeslot: string;       // When the session is scheduled
-  status: 'requested' | 'accepted' | 'declined' | 'completed';
+  status: 'requested' | 'accepted' | 'declined' | 'completed' | 'cancelled';
   sessionTitle?: string;
   description?: string;
   duration?: number;      // in minutes
@@ -24,7 +24,7 @@ export interface CreateBookingRequest {
 }
 
 export interface UpdateBookingRequest {
-  status?: 'accepted' | 'declined' | 'completed';
+  status?: 'accepted' | 'declined' | 'completed' | 'cancelled';
   meetingLink?: string;
   notes?: string;
 }

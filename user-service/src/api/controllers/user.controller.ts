@@ -13,8 +13,9 @@ const createUserSchema = Joi.object({
   seniority: Joi.string().valid('junior', 'mid', 'senior', 'staff', 'principal').optional(),
   bio: Joi.string().max(500).optional(),
   skills: Joi.array().items(Joi.string()).optional(),
-  hourlyRate: Joi.number().min(0).optional(),
-  timezone: Joi.string().optional()
+  hourlyRate: Joi.number().min(0).allow(null).optional(),
+  timezone: Joi.string().optional(),
+  experience: Joi.alternatives().try(Joi.number().min(0), Joi.string()).optional()
 });
 
 const updateUserSchema = Joi.object({
@@ -23,10 +24,11 @@ const updateUserSchema = Joi.object({
   seniority: Joi.string().valid('junior', 'mid', 'senior', 'staff', 'principal').optional(),
   bio: Joi.string().max(500).optional(),
   skills: Joi.array().items(Joi.string()).optional(),
-  hourlyRate: Joi.number().min(0).optional(),
+  hourlyRate: Joi.number().min(0).allow(null).optional(),
   profilePicture: Joi.string().uri().optional(),
   linkedinProfile: Joi.string().uri().optional(),
-  githubProfile: Joi.string().uri().optional()
+  githubProfile: Joi.string().uri().optional(),
+  experience: Joi.alternatives().try(Joi.number().min(0), Joi.string()).optional()
 });
 
 export class UserController {

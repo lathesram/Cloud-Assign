@@ -13,7 +13,7 @@ export class Server {
 
   constructor() {
     this.app = express();
-    this.port = parseInt(process.env.PORT || '3002', 10);
+    this.port = parseInt(process.env.PORT || '3005', 10);
     this.setupMiddlewares();
     this.setupRoutes();
     this.setupErrorHandling();
@@ -34,7 +34,7 @@ export class Server {
 
 
     this.app.use(cors({
-      origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+      origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:4200'],
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],

@@ -3,9 +3,9 @@ export const environment = {
   apiUrl: 'http://localhost:3000', // Development API URL
   services: {
     authService: 'http://localhost:3001',
-    userService: 'http://localhost:3002', 
-    bookingService: 'http://localhost:3003',
-    codeReviewService: 'http://localhost:3004',
-    messagingService: 'http://localhost:3005'
+    userService: 'http://localhost:3005', 
+    bookingService: 'http://localhost:3002',
+    codeReviewService: 'http://localhost:3003',
+    messagingService: 'http://localhost:3004'
   }
 };

@@ -21,7 +21,7 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class CodeReviewService extends BaseHttpService {
-  protected baseUrl = `${environment.services.codeReviewService}/api/code-reviews`;
+  protected baseUrl = `${environment.services.codeReviewService}/api/v1/reviews`;
 
   constructor(private http: HttpClient) {
     super();
@@ -40,9 +40,23 @@ export class CodeReviewService extends BaseHttpService {
     
     const url = queryString ? `${this.baseUrl}?${queryString}` : this.baseUrl;
     
-    return this.http.get<PaginatedResponse<CodeReview>>(url)
+    return this.http.get<any>(url)
       .pipe(
-        map(response => this.handleResponse<PaginatedResponse<CodeReview>>(response)),
+        map(response => {
+          console.log('Raw API response:', response); // Debug log
+          if (response.success !== false && response.data) {
+            return {
+              data: response.data,
+              pagination: response.pagination || {
+                page: 1,
+                limit: 10,
+                total: response.data.length,
+                totalPages: 1
+              }
+            };
+          }
+          return this.handleResponse<PaginatedResponse<CodeReview>>(response);
+        }),
         catchError(this.handleError)
       );
   }
@@ -79,13 +93,20 @@ export class CodeReviewService extends BaseHttpService {
       );
   }
 
-  uploadFile(reviewId: string, file: File): Observable<{ fileUrl: string; fileName: string }> {
+  uploadFile(file: File, reviewData: any): Observable<CodeReview> {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('title', reviewData.title);
+    formData.append('description', reviewData.description);
+    formData.append('programmingLanguage', reviewData.programmingLanguage);
+    formData.append('menteeId', reviewData.menteeId);
+    if (reviewData.priority) {
+      formData.append('priority', reviewData.priority);
+    }
     
-    return this.http.post<ApiResponse<{ fileUrl: string; fileName: string }>>(`${this.baseUrl}/${reviewId}/upload`, formData)
+    return this.http.post<ApiResponse<CodeReview>>(`${this.baseUrl}/upload`, formData)
       .pipe(
-        map(response => this.handleResponse<{ fileUrl: string; fileName: string }>(response)),
+        map(response => this.handleResponse<CodeReview>(response)),
         catchError(this.handleError)
       );
   }
@@ -126,17 +147,27 @@ export class CodeReviewService extends BaseHttpService {
 
   getCodeReviewStats(userId?: string): Observable<ReviewStats> {
     const url = userId ? `${this.baseUrl}/stats?userId=${userId}` : `${this.baseUrl}/stats`;
-    return this.http.get<ApiResponse<ReviewStats>>(url)
+    return this.http.get<any>(url)
       .pipe(
-        map(response => this.handleResponse<ReviewStats>(response)),
+        map(response => {
+          if (response.success !== false && response.data) {
+            return response.data;
+          }
+          return this.handleResponse<ReviewStats>(response);
+        }),
         catchError(this.handleError)
       );
   }
 
   getAnnotations(reviewId: string): Observable<Annotation[]> {
-    return this.http.get<ApiResponse<Annotation[]>>(`${this.baseUrl}/${reviewId}/annotations`)
+    return this.http.get<any>(`${this.baseUrl}/${reviewId}/annotations`)
       .pipe(
-        map(response => this.handleResponse<Annotation[]>(response)),
+        map(response => {
+          if (response.success !== false && response.data) {
+            return response.data;
+          }
+          return this.handleResponse<Annotation[]>(response);
+        }),
         catchError(this.handleError)
       );
   }
@@ -167,9 +198,14 @@ export class CodeReviewService extends BaseHttpService {
 
   getPendingReviews(mentorId?: string): Observable<CodeReview[]> {
     const url = mentorId ? `${this.baseUrl}/pending?mentorId=${mentorId}` : `${this.baseUrl}/pending`;
-    return this.http.get<ApiResponse<CodeReview[]>>(url)
+    return this.http.get<any>(url)
       .pipe(
-        map(response => this.handleResponse<CodeReview[]>(response)),
+        map(response => {
+          if (response.success !== false && response.data) {
+            return response.data;
+          }
+          return this.handleResponse<CodeReview[]>(response);
+        }),
         catchError(this.handleError)
       );
   }

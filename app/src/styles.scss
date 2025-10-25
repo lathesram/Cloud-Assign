@@ -1,4 +1,6 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
 html, body { 
   height: 100%; 
 }
@@ -6,7 +8,8 @@ html, body {
 body { 
   margin: 0; 
   font-family: Roboto, "Helvetica Neue", sans-serif; 
-  background-color: #fafafa;
+  background-color: #ffffff;
+  color: #333333;
 }
 
 .container-fluid {
@@ -17,13 +20,14 @@ body {
   padding: 20px;
 }
 :root {
-  --primary-color: #3f51b5;
-  --accent-color: #e91e63;
-  --warn-color: #f44336;
-  --background-color: #fafafa;
+  --primary-color: #333333;
+  --accent-color: #666666;
+  --warn-color: #dc3545;
+  --background-color: #ffffff;
   --surface-color: #ffffff;
-  --text-primary: rgba(0, 0, 0, 0.87);
-  --text-secondary: rgba(0, 0, 0, 0.54);
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --border-color: #e0e0e0;
 }
 
 .mat-elevation-z1 {
@@ -41,20 +45,22 @@ body {
 .btn-primary {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
+  color: white;
   
   &:hover {
-    background-color: #303f9f;
-    border-color: #303f9f;
+    background-color: #555555;
+    border-color: #555555;
   }
 }
 
 .btn-accent {
-  background-color: var(--accent-color);
-  border-color: var(--accent-color);
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--primary-color);
   
   &:hover {
-    background-color: #c2185b;
-    border-color: #c2185b;
+    background-color: #f8f9fa;
+    border-color: var(--primary-color);
   }
 }
 
@@ -99,8 +105,14 @@ body {
 
 .mat-mdc-card {
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+  border: 1px solid var(--border-color);
+  box-shadow: none;
+  background-color: white;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.mat-mdc-card:hover {
+  border-color: var(--accent-color);
 }
 
 .loading-overlay {
@@ -115,6 +127,39 @@ body {
   align-items: center;
   z-index: 9999;
 }
+/* Minimal Button Styles */
+.mat-mdc-raised-button {
+  box-shadow: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.mat-mdc-raised-button:hover {
+  box-shadow: none;
+  background-color: #555555;
+}
+
+.mat-mdc-outlined-button {
+  border: 1px solid var(--border-color);
+  color: var(--primary-color);
+  background-color: transparent;
+}
+
+.mat-mdc-outlined-button:hover {
+  background-color: #f8f9fa;
+  border-color: var(--primary-color);
+}
+
+.mat-mdc-button {
+  color: var(--primary-color);
+}
+
+.mat-mdc-button:hover {
+  background-color: #f8f9fa;
+}
+
 @media (max-width: 768px) {
   .container-fluid {
     padding: 0 15px;

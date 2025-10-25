@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
 import { MatBadgeModule } from '@angular/material/badge';
 import { RouterLink } from '@angular/router';
 import { CodeReviewService } from '../../../../shared/services/code-review.service';
@@ -19,6 +21,7 @@ import { CodeReview } from '../../../../shared/models/code-review.model';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatTableModule,
     MatButtonModule,
     MatIconModule,
@@ -28,117 +31,160 @@ import { CodeReview } from '../../../../shared/models/code-review.model';
     MatTooltipModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatInputModule,
     MatBadgeModule,
     RouterLink
   ],
   template: `
-    <div class="container-fluid py-4">
-      <div class="row">
-        <div class="col-12">
-          <mat-card>
-            <mat-card-header>
-              <mat-card-title>Code Reviews</mat-card-title>
-              <mat-card-subtitle>Manage code review requests and feedback</mat-card-subtitle>
-              <div class="ms-auto d-flex gap-2">
-                <mat-form-field class="filter-field">
-                  <mat-label>Filter by Status</mat-label>
-                  <mat-select [(value)]="selectedStatus" (selectionChange)="onStatusFilter()">
+    <div class="main-container">
+      <div class="page-header">
+        <h1 class="page-title">Code Reviews</h1>
+        <p class="page-subtitle">Manage code review requests and feedback</p>
+        
+        <div class="action-buttons">
+          <button mat-raised-button routerLink="/code-reviews/form" color="primary">
+            <mat-icon>add</mat-icon>
+            Submit Code for Review
+          </button>
+          <button mat-button routerLink="/code-reviews/my-reviews">
+            <mat-icon>person</mat-icon>
+            My Reviews
+          </button>
+          <button mat-button routerLink="/code-reviews/pending">
+            <mat-icon>hourglass_empty</mat-icon>
+            Pending Reviews
+          </button>
+        </div>
+      </div>
+      
+      <div class="content-card">
+        <div class="filters-section">
+          <div class="row">
+            <div class="col-md-5">
+              <div class="search-field">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Search reviews...</mat-label>
+                  <input matInput 
+                         [(ngModel)]="searchQuery" 
+                         (input)="onSearchChange()"
+                         placeholder="Search by title, description, or technology">
+                  <mat-icon matSuffix>search</mat-icon>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="filter-field">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Status</mat-label>
+                  <mat-select [(value)]="selectedStatus" (selectionChange)="onFilterChange()">
                     <mat-option value="">All Status</mat-option>
                     <mat-option value="pending">Pending</mat-option>
                     <mat-option value="in-review">In Review</mat-option>
                     <mat-option value="completed">Completed</mat-option>
                   </mat-select>
                 </mat-form-field>
-                <mat-form-field class="filter-field">
-                  <mat-label>Filter by Language</mat-label>
-                  <mat-select [(value)]="selectedLanguage" (selectionChange)="onLanguageFilter()">
-                    <mat-option value="">All Languages</mat-option>
-                    <mat-option value="javascript">JavaScript</mat-option>
-                    <mat-option value="typescript">TypeScript</mat-option>
-                    <mat-option value="python">Python</mat-option>
-                    <mat-option value="java">Java</mat-option>
-                    <mat-option value="csharp">C#</mat-option>
-                    <mat-option value="cpp">C++</mat-option>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="filter-field">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Priority</mat-label>
+                  <mat-select [(value)]="selectedPriority" (selectionChange)="onFilterChange()">
+                    <mat-option value="">All Priority</mat-option>
+                    <mat-option value="low">Low</mat-option>
+                    <mat-option value="medium">Medium</mat-option>
+                    <mat-option value="high">High</mat-option>
                   </mat-select>
                 </mat-form-field>
-                <button mat-raised-button color="primary" routerLink="/code-reviews/form">
-                  <mat-icon>add</mat-icon>
-                  Request Review
-                </button>
               </div>
-            </mat-card-header>
-            <mat-card-content>
-              @if (loading) {
-                <div class="text-center py-4">
-                  <mat-spinner></mat-spinner>
-                </div>
-              } @else {
-                <div class="table-responsive">
-                  <table mat-table [dataSource]="reviews" class="w-100">
-                    <!-- Title Column -->
-                    <ng-container matColumnDef="title">
-                      <th mat-header-cell *matHeaderCellDef>Review Request</th>
-                      <td mat-cell *matCellDef="let review">
-                        <div>
-                          <div class="fw-bold">{{ review.title }}</div>
-                          <small class="text-muted">{{ review.description }}</small>
-                          <div class="file-info mt-1">
-                            <mat-icon class="file-icon">attachment</mat-icon>
-                            <span class="filename">{{ review.fileName }}</span>
-                            <span class="file-size">({{ formatFileSize(review.fileSize) }})</span>
-                          </div>
-                        </div>
-                      </td>
-                    </ng-container>
+            </div>
+            <div class="col-md-3">
+              <div class="filter-field">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Assigned To</mat-label>
+                  <mat-select [(value)]="selectedMentor" (selectionChange)="onFilterChange()">
+                    <mat-option value="">All Mentors</mat-option>
+                    <mat-option value="assigned">Assigned</mat-option>
+                    <mat-option value="unassigned">Unassigned</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                    <!-- Language Column -->
-                    <ng-container matColumnDef="language">
-                      <th mat-header-cell *matHeaderCellDef>Language</th>
-                      <td mat-cell *matCellDef="let review">
-                        <mat-chip class="language-chip">
-                          {{ review.programmingLanguage | titlecase }}
-                        </mat-chip>
-                      </td>
-                    </ng-container>
+        <div class="table-container">
+          @if (loading) {
+            <div class="loading-container">
+              <mat-spinner></mat-spinner>
+              <div class="loading-text">Loading reviews...</div>
+            </div>
+          } @else if (filteredReviews.length === 0) {
+            <div class="empty-state">
+              <mat-icon>code_off</mat-icon>
+              <h3>No reviews found</h3>
+              <p>Try adjusting your search or filter criteria</p>
+            </div>
+          } @else {
+            <div class="table-responsive">
+              <table mat-table [dataSource]="filteredReviews" class="w-100">
+                <!-- Title Column -->
+                <ng-container matColumnDef="title">
+                  <th mat-header-cell *matHeaderCellDef>Review Request</th>
+                  <td mat-cell *matCellDef="let review">
+                    <div class="review-info">
+                      <div class="review-title">{{ review.title }}</div>
+                      <div class="review-description">{{ review.description }}</div>
+                      <div class="file-info">
+                        <mat-icon class="file-icon">attachment</mat-icon>
+                        <span class="filename">{{ review.fileName }}</span>
+                        <span class="file-size">({{ review.fileSize ? (review.fileSize + ' bytes') : 'Unknown size' }})</span>
+                      </div>
+                    </div>
+                  </td>
+                </ng-container>
 
-                    <!-- Participants Column -->
-                    <ng-container matColumnDef="participants">
-                      <th mat-header-cell *matHeaderCellDef>Participants</th>
-                      <td mat-cell *matCellDef="let review">
-                        <div class="participants">
-                          <div class="participant">
-                            <mat-icon class="participant-icon">person</mat-icon>
-                            <span>{{ review.menteeName || 'Mentee' }}</span>
-                          </div>
-                          @if (review.mentorName) {
-                            <div class="participant">
-                              <mat-icon class="participant-icon">school</mat-icon>
-                              <span>{{ review.mentorName }}</span>
-                            </div>
-                          } @else {
-                            <div class="participant text-muted">
-                              <mat-icon class="participant-icon">school</mat-icon>
-                              <span>Awaiting mentor</span>
-                            </div>
-                          }
-                        </div>
-                      </td>
-                    </ng-container>
+                <!-- Language Column -->
+                <ng-container matColumnDef="language">
+                  <th mat-header-cell *matHeaderCellDef>Language</th>
+                  <td mat-cell *matCellDef="let review">
+                    <span class="language-chip">
+                      {{ review.programmingLanguage | titlecase }}
+                    </span>
+                  </td>
+                </ng-container>
 
-                    <!-- Status Column -->
-                    <ng-container matColumnDef="status">
-                      <th mat-header-cell *matHeaderCellDef>Status</th>
-                      <td mat-cell *matCellDef="let review">
-                        <mat-chip [color]="getStatusColor(review.status)">
-                          {{ review.status | titlecase }}
-                        </mat-chip>
-                        @if (review.priority) {
-                          <div class="priority-badge" [class]="'priority-' + review.priority">
-                            {{ review.priority | titlecase }}
-                          </div>
-                        }
-                      </td>
-                    </ng-container>
+                <!-- Participants Column -->
+                <ng-container matColumnDef="participants">
+                  <th mat-header-cell *matHeaderCellDef>Participants</th>
+                  <td mat-cell *matCellDef="let review">
+                    <div class="mentor-info">
+                      <div class="mentor-name">👤 {{ review.menteeName || 'Mentee' }}</div>
+                      @if (review.mentorName) {
+                        <div class="mentor-name">👨‍🏫 {{ review.mentorName }}</div>
+                      } @else {
+                        <div class="mentor-status">Awaiting mentor assignment</div>
+                      }
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef>Status</th>
+                  <td mat-cell *matCellDef="let review">
+                    <span class="status-chip" [class]="review.status">
+                      {{ review.status | titlecase }}
+                    </span>
+                    @if (review.priority) {
+                      <div style="margin-top: 8px;">
+                        <span class="priority-chip" [class]="review.priority">
+                          {{ review.priority | titlecase }}
+                        </span>
+                      </div>
+                    }
+                  </td>
+                </ng-container>
 
                     <!-- Annotations Column -->
                     <ng-container matColumnDef="annotations">
@@ -170,85 +216,408 @@ import { CodeReview } from '../../../../shared/models/code-review.model';
                     <ng-container matColumnDef="actions">
                       <th mat-header-cell *matHeaderCellDef>Actions</th>
                       <td mat-cell *matCellDef="let review">
-                        <button mat-icon-button [routerLink]="['/code-reviews/details', review.reviewId]" matTooltip="View Details">
+                        <button mat-icon-button [routerLink]="['/code-reviews/details', review.reviewId]" 
+                                matTooltip="View Details" class="action-button">
                           <mat-icon>visibility</mat-icon>
                         </button>
                         @if (review.status === 'pending') {
-                          <button mat-icon-button color="primary" (click)="assignToMe(review.reviewId)" matTooltip="Take Review">
+                          <button mat-icon-button (click)="assignToMe(review.reviewId)" 
+                                  matTooltip="Take Review" class="action-button">
                             <mat-icon>assignment_ind</mat-icon>
                           </button>
                         }
                         @if (review.status === 'in-review') {
-                          <button mat-icon-button color="accent" (click)="completeReview(review.reviewId)" matTooltip="Mark Complete">
+                          <button mat-icon-button (click)="completeReview(review.reviewId)" 
+                                  matTooltip="Mark Complete" class="action-button">
                             <mat-icon>done</mat-icon>
                           </button>
                         }
-                        <button mat-icon-button (click)="downloadFile(review.s3FileUrl, review.fileName)" matTooltip="Download File">
+                        <button mat-icon-button (click)="downloadFile(review.s3FileUrl, review.fileName)" 
+                                matTooltip="Download File" class="action-button">
                           <mat-icon>download</mat-icon>
                         </button>
                       </td>
                     </ng-container>
 
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                  </table>
-                </div>
-              }
-            </mat-card-content>
-          </mat-card>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+              </table>
+            </div>
+          }
         </div>
       </div>
-    </div>
   `,
   styles: `
-    .filter-field {
-      width: 150px;
+    .main-container {
+      min-height: 100vh;
+      background: white;
+      padding: 2rem;
     }
-    
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: #666;
+      margin: 0 0 1rem 0;
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .action-buttons button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .content-card {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .filters-section {
+      margin-bottom: 2rem;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -0.75rem;
+    }
+
+    .col-md-2, .col-md-3, .col-md-5 {
+      padding: 0 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .col-md-2 {
+      flex: 0 0 16.666667%;
+      max-width: 16.666667%;
+    }
+
+    .col-md-3 {
+      flex: 0 0 25%;
+      max-width: 25%;
+    }
+
+    .col-md-5 {
+      flex: 0 0 41.666667%;
+      max-width: 41.666667%;
+    }
+
+    .search-field, .filter-field {
+      width: 100%;
+    }
+
+    .w-100 {
+      width: 100%;
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-floating-label {
+      color: #666;
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-input-element {
+      color: #333;
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-input-element::placeholder {
+      color: #999;
+    }
+
+    ::ng-deep .mat-mdc-select-arrow {
+      color: #666;
+    }
+
+    ::ng-deep .mat-mdc-select-value {
+      color: #333 !important;
+    }
+
+    ::ng-deep .mat-mdc-select-placeholder {
+      color: #999 !important;
+    }
+
+    ::ng-deep .mat-mdc-select-value-text {
+      color: #333 !important;
+    }
+
+    ::ng-deep .mat-icon {
+      color: #666;
+    }
+
+    ::ng-deep .mat-mdc-select-panel {
+      background: white !important;
+      border-radius: 4px !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    ::ng-deep .mat-mdc-option {
+      color: #333 !important;
+    }
+
+    ::ng-deep .mat-mdc-option:hover {
+      background: #f5f5f5 !important;
+    }
+
+    ::ng-deep .mat-mdc-option.mdc-list-item--selected {
+      background: #e3f2fd !important;
+    }
+
+    .table-container {
+      background: white;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    ::ng-deep .mat-mdc-table {
+      background: white;
+      color: #333;
+    }
+
+    ::ng-deep .mat-mdc-header-cell {
+      background: #f5f5f5;
+      color: #333;
+      font-weight: 600;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 1rem;
+    }
+
+    ::ng-deep .mat-mdc-cell {
+      color: #333;
+      border-bottom: 1px solid #f0f0f0;
+      padding: 1rem;
+    }
+
+    ::ng-deep .mat-mdc-row:hover {
+      background: #f9f9f9;
+    }
+
+    .review-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .review-title {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #333;
+    }
+
+    .review-description {
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.4;
+    }
+
     .file-info {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 0.5rem;
       font-size: 0.85rem;
-      color: #666;
+      color: #999;
+      margin-top: 0.25rem;
     }
-    
+
     .file-icon {
       font-size: 16px;
       width: 16px;
       height: 16px;
     }
-    
+
     .filename {
       font-weight: 500;
+      color: #555;
     }
-    
+
     .file-size {
       color: #999;
     }
-    
+
     .language-chip {
-      background: #e8f5e8;
-      color: #2e7d32;
+      background: #f5f5f5;
+      color: #333;
+      padding: 0.3rem 0.8rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: 1px solid #e0e0e0;
+      display: inline-block;
     }
-    
-    .participants {
+
+    .mentor-info {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 0.25rem;
     }
-    
-    .participant {
+
+    .mentor-name {
+      font-size: 0.9rem;
+      color: #333;
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 0.9rem;
+      gap: 0.5rem;
     }
-    
-    .participant-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
+
+    .mentor-status {
+      font-size: 0.85rem;
+      color: #999;
+      font-style: italic;
+    }
+
+    .status-chip {
+      padding: 0.3rem 0.8rem;
+      border-radius: 15px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: inline-block;
+      text-transform: capitalize;
+    }
+
+    .status-chip.pending {
+      background: #fff3e0;
+      color: #e65100;
+      border: 1px solid #ffcc02;
+    }
+
+    .status-chip.in-review {
+      background: #e3f2fd;
+      color: #1565c0;
+      border: 1px solid #42a5f5;
+    }
+
+    .status-chip.completed {
+      background: #e8f5e8;
+      color: #2e7d32;
+      border: 1px solid #66bb6a;
+    }
+
+    .priority-chip {
+      padding: 0.3rem 0.8rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: inline-block;
+      text-transform: capitalize;
+    }
+
+    .priority-chip.low {
+      background: #f5f5f5;
+      color: #666;
+      border: 1px solid #e0e0e0;
+    }
+
+    .priority-chip.medium {
+      background: #fff3e0;
+      color: #e65100;
+      border: 1px solid #ffcc02;
+    }
+
+    .priority-chip.high {
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ef5350;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem;
+      color: #666;
+    }
+
+    .loading-text {
+      margin-top: 1rem;
+      font-size: 1.1rem;
+      color: #666;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #666;
+    }
+
+    .empty-state mat-icon {
+      font-size: 4rem;
+      width: 4rem;
+      height: 4rem;
+      color: #ccc;
+      margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem 0;
+      color: #333;
+    }
+
+    .empty-state p {
+      font-size: 1rem;
+      color: #666;
+      margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 1rem;
+      }
+
+      .page-title {
+        font-size: 2rem;
+      }
+
+      .content-card {
+        padding: 1.5rem;
+      }
+
+      .col-md-2, .col-md-3, .col-md-5 {
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+
+      .action-buttons {
+        justify-content: center;
+      }
+
+      .table-responsive {
+        font-size: 0.85rem;
+      }
     }
     
     .priority-badge {
@@ -269,8 +638,8 @@ import { CodeReview } from '../../../../shared/models/code-review.model';
       }
       
       &.priority-low {
-        background: #e8f5e8;
-        color: #2e7d32;
+        background: rgba(255,255,255,0.1);
+        color: rgba(255,255,255,0.8);
       }
     }
     
@@ -296,10 +665,14 @@ import { CodeReview } from '../../../../shared/models/code-review.model';
 })
 export class ReviewsListComponent implements OnInit {
   reviews: CodeReview[] = [];
+  filteredReviews: CodeReview[] = [];
   loading = false;
   selectedStatus = '';
-  selectedLanguage = '';
+  selectedPriority = '';
+  selectedMentor = '';
+  searchQuery = '';
   displayedColumns: string[] = ['title', 'language', 'participants', 'status', 'annotations', 'date', 'actions'];
+  private searchTimeout: any;
 
   constructor(private codeReviewService: CodeReviewService) {}
 
@@ -309,28 +682,71 @@ export class ReviewsListComponent implements OnInit {
 
   loadReviews(): void {
     this.loading = true;
-    const filters: any = {};
-    if (this.selectedStatus) filters.status = this.selectedStatus;
-    if (this.selectedLanguage) filters.programmingLanguage = this.selectedLanguage;
-    
-    this.codeReviewService.getCodeReviews(undefined, filters).subscribe({
+    this.codeReviewService.getCodeReviews().subscribe({
       next: (response: any) => {
-        this.reviews = response.data;
+        console.log('API Response:', response); // Debug log
+        // Handle both direct array and wrapped response formats
+        if (Array.isArray(response)) {
+          this.reviews = response;
+        } else if (response && Array.isArray(response.data)) {
+          this.reviews = response.data;
+        } else {
+          console.error('Unexpected response format:', response);
+          this.reviews = [];
+        }
+        this.filteredReviews = [...this.reviews];
+        this.applyFilters();
         this.loading = false;
       },
       error: (error: any) => {
         console.error('Error loading reviews:', error);
+        this.reviews = [];
+        this.filteredReviews = [];
         this.loading = false;
       }
     });
   }
 
-  onStatusFilter(): void {
-    this.loadReviews();
+  onSearchChange(): void {
+    clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => {
+      this.applyFilters();
+    }, 300);
   }
 
-  onLanguageFilter(): void {
-    this.loadReviews();
+  onFilterChange(): void {
+    this.applyFilters();
+  }
+
+  private applyFilters(): void {
+    let filtered = [...this.reviews];
+
+    if (this.searchQuery.trim()) {
+      const query = this.searchQuery.toLowerCase();
+      filtered = filtered.filter(review => 
+        review.title.toLowerCase().includes(query) ||
+        (review.description && review.description.toLowerCase().includes(query)) ||
+        (review.programmingLanguage && review.programmingLanguage.toLowerCase().includes(query))
+      );
+    }
+
+    if (this.selectedStatus) {
+      filtered = filtered.filter(review => review.status === this.selectedStatus);
+    }
+
+    if (this.selectedPriority) {
+      filtered = filtered.filter(review => review.priority === this.selectedPriority);
+    }
+
+    if (this.selectedMentor) {
+      if (this.selectedMentor === 'assigned') {
+        filtered = filtered.filter(review => review.mentorId);
+      } else if (this.selectedMentor === 'unassigned') {
+        filtered = filtered.filter(review => !review.mentorId);
+      }
+    }
+
+    this.filteredReviews = filtered;
   }
 
   getStatusColor(status: string): string {

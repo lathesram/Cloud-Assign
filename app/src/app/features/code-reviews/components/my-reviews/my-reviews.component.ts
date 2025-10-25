@@ -51,7 +51,7 @@ import { CodeReview } from '../../../../shared/models/code-review.model';
                           <mat-icon>assignment</mat-icon>
                           <h3>No code reviews submitted</h3>
                           <p>You haven't submitted any code for review yet.</p>
-                          <button mat-raised-button color="primary" routerLink="/code-reviews/form">
+                          <button mat-raised-button routerLink="/code-reviews/form">
                             Submit Code for Review
                           </button>
                         </div>
@@ -104,7 +104,7 @@ import { CodeReview } from '../../../../shared/models/code-review.model';
                               <th mat-header-cell *matHeaderCellDef>Feedback</th>
                               <td mat-cell *matCellDef="let review">
                                 @if (review.annotations && review.annotations.length > 0) {
-                                  <mat-icon [matBadge]="review.annotations.length" matBadgeColor="accent">comment</mat-icon>
+                                  <mat-icon [matBadge]="review.annotations.length">comment</mat-icon>
                                 } @else {
                                   <span class="text-muted">No feedback yet</span>
                                 }
@@ -149,7 +149,7 @@ import { CodeReview } from '../../../../shared/models/code-review.model';
                           <mat-icon>assignment_ind</mat-icon>
                           <h3>No reviews assigned</h3>
                           <p>You don't have any code reviews assigned to you for mentoring.</p>
-                          <button mat-raised-button color="primary" routerLink="/code-reviews">
+                          <button mat-raised-button routerLink="/code-reviews">
                             Browse Available Reviews
                           </button>
                         </div>
@@ -199,7 +199,7 @@ import { CodeReview } from '../../../../shared/models/code-review.model';
                               <td mat-cell *matCellDef="let review">
                                 <div class="progress-info">
                                   @if (review.annotations && review.annotations.length > 0) {
-                                    <mat-icon [matBadge]="review.annotations.length" matBadgeColor="accent">comment</mat-icon>
+                                    <mat-icon [matBadge]="review.annotations.length">comment</mat-icon>
                                     <span>{{ review.annotations.length }} feedback added</span>
                                   } @else {
                                     <span class="text-warning">No feedback yet</span>
@@ -222,7 +222,7 @@ import { CodeReview } from '../../../../shared/models/code-review.model';
                                   <mat-icon>visibility</mat-icon>
                                 </button>
                                 @if (review.status === 'in-review') {
-                                  <button mat-icon-button color="accent" (click)="completeReview(review.reviewId)">
+                                  <button mat-icon-button (click)="completeReview(review.reviewId)">
                                     <mat-icon>check</mat-icon>
                                   </button>
                                 }

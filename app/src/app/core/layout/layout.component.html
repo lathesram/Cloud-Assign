@@ -4,7 +4,7 @@
     [mode]="isMobile ? 'over' : 'side'" 
     [opened]="!isMobile" 
     class="layout-sidenav">
-    <mat-toolbar color="primary" class="sidenav-header">SkillBridge</mat-toolbar>
+    <mat-toolbar class="sidenav-header">SkillBridge</mat-toolbar>
     <mat-nav-list>
       @for (item of navItems; track item.route) {
         <a mat-list-item [routerLink]="item.route" routerLinkActive="active" (click)="isMobile && sidenav.close()">
@@ -15,7 +15,7 @@
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
-    <mat-toolbar color="primary" class="layout-toolbar">
+    <mat-toolbar class="layout-toolbar">
       @if (isMobile) {
         <button mat-icon-button (click)="sidenav.toggle()" class="menu-button">
           <mat-icon>menu</mat-icon>

@@ -52,8 +52,9 @@ export interface CreateUserRequest {
   seniority?: 'junior' | 'mid' | 'senior' | 'staff' | 'principal';
   bio?: string;
   skills?: string[];
-  hourlyRate?: number;
+  hourlyRate?: number | null;
   timezone?: string;
+  experience?: number | string;
 }
 
 export interface UpdateUserRequest {
@@ -62,7 +63,7 @@ export interface UpdateUserRequest {
   seniority?: 'junior' | 'mid' | 'senior' | 'staff' | 'principal';
   bio?: string;
   skills?: string[];
-  hourlyRate?: number;
+  hourlyRate?: number | null;
   availability?: {
     timezone: string;
     slots: TimeSlot[];
@@ -70,6 +71,7 @@ export interface UpdateUserRequest {
   profilePicture?: string;
   linkedinProfile?: string;
   githubProfile?: string;
+  experience?: number | string;
 }
 
 export interface SearchUsersRequest {

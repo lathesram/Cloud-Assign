@@ -132,7 +132,7 @@ import { CodeReview, Annotation } from '../../../../shared/models/code-review.mo
 
                       @if (canAddAnnotation()) {
                         <div class="add-annotation-section">
-                          <button mat-raised-button color="primary" (click)="toggleAnnotationForm()">
+                          <button mat-raised-button (click)="toggleAnnotationForm()">
                             <mat-icon>add_comment</mat-icon>
                             Add Feedback
                           </button>
@@ -177,7 +177,7 @@ import { CodeReview, Annotation } from '../../../../shared/models/code-review.mo
                           </mat-card-content>
                           <mat-card-actions>
                             <button mat-button (click)="cancelAnnotation()">Cancel</button>
-                            <button mat-raised-button color="primary" (click)="submitAnnotation()">
+                            <button mat-raised-button (click)="submitAnnotation()">
                               Add Feedback
                             </button>
                           </mat-card-actions>
@@ -277,13 +277,13 @@ import { CodeReview, Annotation } from '../../../../shared/models/code-review.mo
                   <div class="actions-section">
                     <h4>Actions</h4>
                     @if (canTakeReview()) {
-                      <button mat-raised-button color="primary" (click)="takeReview()" class="w-100 mb-2">
+                      <button mat-raised-button (click)="takeReview()" class="w-100 mb-2">
                         <mat-icon>assignment_ind</mat-icon>
                         Take This Review
                       </button>
                     }
                     @if (canCompleteReview()) {
-                      <button mat-raised-button color="accent" (click)="completeReview()" class="w-100">
+                      <button mat-raised-button (click)="completeReview()" class="w-100">
                         <mat-icon>check</mat-icon>
                         Mark as Complete
                       </button>
@@ -299,7 +299,7 @@ import { CodeReview, Annotation } from '../../../../shared/models/code-review.mo
           <mat-icon class="error-icon">error</mat-icon>
           <h3>Review not found</h3>
           <p>The requested code review could not be found.</p>
-          <button mat-raised-button color="primary" (click)="goBack()">
+          <button mat-raised-button (click)="goBack()">
             Go Back
           </button>
         </div>
@@ -348,7 +348,7 @@ import { CodeReview, Annotation } from '../../../../shared/models/code-review.mo
       margin-top: 8px;
 
       .file-icon {
-        color: #4caf50;
+        color: rgba(255, 255, 255, 0.8);
       }
 
       .file-details {
@@ -423,8 +423,8 @@ import { CodeReview, Annotation } from '../../../../shared/models/code-review.mo
         }
 
         .suggestion {
-          background-color: #e8f5e8;
-          border-left: 3px solid #4caf50;
+          background-color: rgba(255, 255, 255, 0.1);
+          border-left: 3px solid rgba(255, 255, 255, 0.6);
         }
       }
 
@@ -458,7 +458,7 @@ import { CodeReview, Annotation } from '../../../../shared/models/code-review.mo
           margin-top: 4px;
 
           &.created {
-            color: #4caf50;
+            color: rgba(255, 255, 255, 0.8);
           }
 
           &.assigned {
@@ -565,6 +565,87 @@ import { CodeReview, Annotation } from '../../../../shared/models/code-review.mo
       height: 64px;
       color: #f44336;
       margin-bottom: 16px;
+    }
+
+    ::ng-deep .mat-mdc-form-field {
+      background: transparent;
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-floating-label {
+      color: rgba(255,255,255,0.8);
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-input-element {
+      color: white;
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-input-element::placeholder {
+      color: rgba(255,255,255,0.6);
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-text-field-wrapper {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    ::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+      color: white;
+    }
+
+    ::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-notched-outline {
+      display: none;
+    }
+
+    ::ng-deep .mat-mdc-form-field .mat-mdc-notched-outline-leading,
+    ::ng-deep .mat-mdc-form-field .mat-mdc-notched-outline-trailing,
+    ::ng-deep .mat-mdc-form-field .mat-mdc-notched-outline-notch {
+      border: none;
+    }
+
+    ::ng-deep .mat-mdc-select-arrow {
+      color: rgba(255,255,255,0.8);
+    }
+
+    ::ng-deep .mat-mdc-select-value {
+      color: white !important;
+    }
+
+    ::ng-deep .mat-mdc-select-placeholder {
+      color: rgba(255,255,255,0.6) !important;
+    }
+
+    ::ng-deep .mat-mdc-select-value-text {
+      color: white !important;
+    }
+
+    ::ng-deep .mat-icon {
+      color: rgba(255,255,255,0.8);
+    }
+
+    ::ng-deep .mat-mdc-select-panel {
+      background: rgba(255, 255, 255, 0.95) !important;
+      backdrop-filter: blur(20px);
+      border-radius: 12px !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    ::ng-deep .mat-mdc-option {
+      color: #333 !important;
+    }
+
+    ::ng-deep .mat-mdc-option:hover {
+      background: rgba(102, 126, 234, 0.1) !important;
+    }
+
+    ::ng-deep .mat-mdc-option.mdc-list-item--selected {
+      background: rgba(102, 126, 234, 0.2) !important;
     }
   `
 })

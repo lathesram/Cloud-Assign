@@ -1,172 +1,122 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterLink } from '@angular/router';
+import { CodeReviewService } from '../../shared/services/code-review.service';
+import { ReviewStats } from '../../shared/models/code-review.model';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, RouterLink],
+  imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, RouterLink],
   template: `
-    <div class="container-fluid py-4">
-      <div class="row">
-        <div class="col-12">
-          <h1 class="h2 mb-4">SkillBridge Dashboard</h1>
+    <div class="main-container">
+      <div class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Welcome to SkillBridge - Your Learning & Mentorship Platform</p>
+      </div>
+      
+      <div class="dashboard-grid">
+        <!-- Quick Stats Cards -->
+        <div class="stats-section">
+          <div class="stat-card users-card">
+            <div class="stat-icon">
+              <mat-icon>people</mat-icon>
+            </div>
+            <div class="stat-content">
+              <h3>Users</h3>
+              <p class="stat-number">150+</p>
+              <p class="stat-description">Active mentors & mentees</p>
+            </div>
+          </div>
           
-          <!-- Stats Cards -->
-          <div class="row mb-4">
-            <div class="col-lg-3 col-md-6 col-sm-6">
-              <mat-card class="stat-card">
-                <mat-card-content>
-                  <div class="stat-content">
-                    <mat-icon class="stat-icon users">people</mat-icon>
-                    <div class="stat-info">
-                      <h3>1,234</h3>
-                      <p>Total Users</p>
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
+          <div class="stat-card bookings-card">
+            <div class="stat-icon">
+              <mat-icon>event</mat-icon>
             </div>
-            <div class="col-lg-3 col-md-6 col-sm-6">
-              <mat-card class="stat-card">
-                <mat-card-content>
-                  <div class="stat-content">
-                    <mat-icon class="stat-icon bookings">event</mat-icon>
-                    <div class="stat-info">
-                      <h3>567</h3>
-                      <p>Active Bookings</p>
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6">
-              <mat-card class="stat-card">
-                <mat-card-content>
-                  <div class="stat-content">
-                    <mat-icon class="stat-icon reviews">code</mat-icon>
-                    <div class="stat-info">
-                      <h3>89</h3>
-                      <p>Code Reviews</p>
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6">
-              <mat-card class="stat-card">
-                <mat-card-content>
-                  <div class="stat-content">
-                    <mat-icon class="stat-icon sessions">videocam</mat-icon>
-                    <div class="stat-info">
-                      <h3>2,345</h3>
-                      <p>Total Sessions</p>
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
+            <div class="stat-content">
+              <h3>Sessions</h3>
+              <p class="stat-number">320+</p>
+              <p class="stat-description">Mentoring sessions booked</p>
             </div>
           </div>
-
-          <!-- Quick Actions -->
-          <div class="row">
-            <div class="col-lg-4 col-md-6">
-              <mat-card class="action-card">
-                <mat-card-header>
-                  <mat-card-title>User Management</mat-card-title>
-                  <mat-card-subtitle>Manage mentors and mentees</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                  <p>View all users, create new accounts, and manage user profiles. Monitor mentor-mentee relationships and user activity.</p>
-                </mat-card-content>
-                <mat-card-actions>
-                  <button mat-raised-button color="primary" routerLink="/users">
-                    <mat-icon>people</mat-icon>
-                    View Users
-                  </button>
-                </mat-card-actions>
-              </mat-card>
+          
+          <div class="stat-card reviews-card">
+            <div class="stat-icon">
+              <mat-icon>code</mat-icon>
             </div>
-            <div class="col-lg-4 col-md-6">
-              <mat-card class="action-card">
-                <mat-card-header>
-                  <mat-card-title>Session Bookings</mat-card-title>
-                  <mat-card-subtitle>Manage mentoring sessions</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                  <p>Schedule new sessions, view upcoming bookings, and manage session details. Track session history and performance.</p>
-                </mat-card-content>
-                <mat-card-actions>
-                  <button mat-raised-button color="primary" routerLink="/bookings">
-                    <mat-icon>event</mat-icon>
-                    View Bookings
-                  </button>
-                </mat-card-actions>
-              </mat-card>
-            </div>
-            <div class="col-lg-4 col-md-12">
-              <mat-card class="action-card">
-                <mat-card-header>
-                  <mat-card-title>Code Reviews</mat-card-title>
-                  <mat-card-subtitle>Review and provide feedback</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                  <p>Submit code for review, provide feedback on submissions, and track review progress. Help improve coding skills.</p>
-                </mat-card-content>
-                <mat-card-actions>
-                  <button mat-raised-button color="primary" routerLink="/code-reviews">
-                    <mat-icon>code</mat-icon>
-                    View Reviews
-                  </button>
-                </mat-card-actions>
-              </mat-card>
+            <div class="stat-content">
+              <h3>Code Reviews</h3>
+              @if (loadingStats) {
+                <mat-spinner diameter="30"></mat-spinner>
+              } @else {
+                <p class="stat-number">{{ reviewStats?.totalReviews || 0 }}</p>
+                <p class="stat-description">
+                  {{ reviewStats?.completedReviews || 0 }} completed, 
+                  {{ reviewStats?.pendingReviews || 0 }} pending
+                </p>
+              }
             </div>
           </div>
-
-          <!-- Recent Activity -->
-          <div class="row mt-4">
-            <div class="col-12">
-              <mat-card>
-                <mat-card-header>
-                  <mat-card-title>Recent Activity</mat-card-title>
-                  <mat-card-subtitle>Latest platform activity</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                  <div class="activity-list">
-                    <div class="activity-item">
-                      <mat-icon class="activity-icon">person_add</mat-icon>
-                      <div class="activity-content">
-                        <p><strong>New mentor joined:</strong> Sarah Johnson registered as a JavaScript mentor</p>
-                        <small class="text-muted">2 minutes ago</small>
-                      </div>
-                    </div>
-                    <div class="activity-item">
-                      <mat-icon class="activity-icon">event</mat-icon>
-                      <div class="activity-content">
-                        <p><strong>Session booked:</strong> Python mentoring session scheduled for tomorrow at 2 PM</p>
-                        <small class="text-muted">15 minutes ago</small>
-                      </div>
-                    </div>
-                    <div class="activity-item">
-                      <mat-icon class="activity-icon">code</mat-icon>
-                      <div class="activity-content">
-                        <p><strong>Code review completed:</strong> React component review finished with 3 suggestions</p>
-                        <small class="text-muted">1 hour ago</small>
-                      </div>
-                    </div>
-                    <div class="activity-item">
-                      <mat-icon class="activity-icon">star</mat-icon>
-                      <div class="activity-content">
-                        <p><strong>Session completed:</strong> Machine Learning session completed successfully</p>
-                        <small class="text-muted">3 hours ago</small>
-                      </div>
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="actions-section">
+          <div class="content-card">
+            <h2 class="section-title">Quick Actions</h2>
+            <div class="action-buttons">
+              <button mat-raised-button class="action-btn users-btn" routerLink="/users">
+                <mat-icon>person_add</mat-icon>
+                Manage Users
+              </button>
+              <button mat-raised-button class="action-btn bookings-btn" routerLink="/bookings">
+                <mat-icon>event_available</mat-icon>
+                Book Session
+              </button>
+              <button mat-raised-button class="action-btn reviews-btn" routerLink="/code-reviews">
+                <mat-icon>rate_review</mat-icon>
+                Request Review
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="activity-section">
+          <div class="content-card">
+            <h2 class="section-title">Recent Activity</h2>
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-icon users-icon">
+                  <mat-icon>person</mat-icon>
+                </div>
+                <div class="activity-content">
+                  <p class="activity-title">New mentor registered</p>
+                  <p class="activity-time">2 hours ago</p>
+                </div>
+              </div>
+              
+              <div class="activity-item">
+                <div class="activity-icon bookings-icon">
+                  <mat-icon>event</mat-icon>
+                </div>
+                <div class="activity-content">
+                  <p class="activity-title">Session completed</p>
+                  <p class="activity-time">4 hours ago</p>
+                </div>
+              </div>
+              
+              <div class="activity-item">
+                <div class="activity-icon reviews-icon">
+                  <mat-icon>code</mat-icon>
+                </div>
+                <div class="activity-content">
+                  <p class="activity-title">Code review submitted</p>
+                  <p class="activity-time">6 hours ago</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -174,112 +124,253 @@ import { RouterLink } from '@angular/router';
     </div>
   `,
   styles: [`
-    .stat-card {
-      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-      margin-bottom: 1rem;
-      cursor: pointer;
-    }
-    
-    .stat-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+    .main-container {
+      min-height: 100vh;
+      background-color: #ffffff;
+      padding: 2rem;
     }
 
-    .stat-content {
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 2rem 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: #333333;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: #666666;
+      margin: 0;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .stats-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 1.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .stat-card:hover {
+      border-color: #333333;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      background: rgba(255,255,255,0.15);
     }
 
     .stat-icon {
-      font-size: 48px;
-      width: 48px;
-      height: 48px;
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
-    .stat-icon.users { color: #4caf50; }
-    .stat-icon.bookings { color: #2196f3; }
-    .stat-icon.reviews { color: #ff9800; }
-    .stat-icon.sessions { color: #e91e63; }
-
-    .stat-info h3 {
-      margin: 0;
-      font-size: 2rem;
-      font-weight: bold;
+    .stat-icon mat-icon {
+      font-size: 28px;
+      color: #666666;
     }
 
-    .stat-info p {
+    .stat-content h3 {
+      font-size: 1.1rem;
+      color: #333333;
+      margin: 0 0 0.5rem 0;
+      font-weight: 600;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #333333;
       margin: 0;
-      color: #666;
+      line-height: 1;
+    }
+
+    .stat-description {
       font-size: 0.9rem;
+      color: #666666;
+      margin: 0.5rem 0 0 0;
     }
 
-    .action-card {
-      height: 100%;
-      margin-bottom: 1rem;
-      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    .content-card {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
     }
 
-    .action-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #333333;
+      margin: 0 0 1.5rem 0;
+    }
+
+    .action-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .action-btn {
+      padding: 1rem 1.5rem;
+      border-radius: 6px;
+      font-weight: 500;
+      border: 1px solid #e0e0e0;
+      color: #333333;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .users-btn {
+      background: linear-gradient(135deg, #9c27b0, #e91e63);
+    }
+
+    .bookings-btn {
+      background: linear-gradient(135deg, #2196f3, #21cbf3);
+    }
+
+    .reviews-btn {
+      background: linear-gradient(135deg, #4caf50, #8bc34a);
+    }
+
+    .action-btn:hover {
+      border-color: #333333;
+      background-color: #f8f9fa;
     }
 
     .activity-list {
-      max-height: 300px;
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
 
     .activity-item {
       display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      padding: 12px 0;
-      border-bottom: 1px solid #eee;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      transition: all 0.2s ease;
     }
 
-    .activity-item:last-child {
-      border-bottom: none;
+    .activity-item:hover {
+      background: #f0f0f0;
     }
 
     .activity-icon {
-      color: #666;
-      margin-top: 4px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+    }
+
+    .activity-icon mat-icon {
+      font-size: 20px;
+      color: #666666;
     }
 
     .activity-content {
       flex: 1;
     }
 
-    .activity-content p {
-      margin: 0 0 4px 0;
+    .activity-title {
+      font-weight: 500;
+      color: #333333;
+      margin: 0 0 0.25rem 0;
     }
 
-    .text-muted {
-      color: #999;
+    .activity-time {
+      font-size: 0.9rem;
+      color: #666666;
+      margin: 0;
     }
 
-    @media (max-width: 576px) {
-      .stat-info h3 {
-        font-size: 1.5rem;
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 1rem;
       }
-      
-      .stat-icon {
-        font-size: 36px;
-        width: 36px;
-        height: 36px;
+
+      .page-title {
+        font-size: 2rem;
       }
-      
-      .activity-item {
-        flex-direction: column;
-        gap: 8px;
+
+      .stats-section {
+        grid-template-columns: 1fr;
       }
-      
-      .activity-icon {
-        align-self: flex-start;
+
+      .action-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-card {
+        padding: 1.5rem;
       }
     }
   `]
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
+  reviewStats: ReviewStats | null = null;
+  loadingStats = false;
+
+  constructor(private codeReviewService: CodeReviewService) {}
+
+  ngOnInit(): void {
+    this.loadReviewStats();
+  }
+
+  loadReviewStats(): void {
+    this.loadingStats = true;
+    this.codeReviewService.getCodeReviewStats().subscribe({
+      next: (stats: ReviewStats) => {
+        this.reviewStats = stats;
+        this.loadingStats = false;
+      },
+      error: (error: any) => {
+        console.error('Error loading review stats:', error);
+        this.loadingStats = false;
+      }
+    });
+  }
 }
