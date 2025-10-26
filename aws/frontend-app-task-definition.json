@@ -1,0 +1,27 @@
+{
+  "family": "skillbridge-frontend-app",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::853519595029:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "frontend-app",
+      "image": "853519595029.dkr.ecr.ap-southeast-1.amazonaws.com/skillbridge-frontend-app:latest",
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        }
+      ]
+    }
+  ]
+}

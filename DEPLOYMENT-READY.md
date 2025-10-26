@@ -3,10 +3,11 @@
 ## ✅ What's Been Set Up
 
 ### GitHub Actions Workflows Created:
+- `deploy-frontend-app.yml` - Deploys Angular frontend
 - `deploy-booking-service.yml` - Deploys booking service
 - `deploy-user-service.yml` - Deploys user service  
 - `deploy-code-review-service.yml` - Deploys code review service
-- `deploy-all-services.yml` - Deploys all services at once
+- `deploy-all-services.yml` - Deploys all services at once (frontend + backend)
 
 ### Configuration:
 - **AWS Region**: ap-southeast-1
@@ -27,7 +28,8 @@ Add these two secrets:
 ### Step 2: Create ECR Repositories in AWS Console
 https://ap-southeast-1.console.aws.amazon.com/ecr/repositories
 
-Create these 3 repositories:
+Create these 4 repositories:
+- `skillbridge-frontend-app` (Angular app)
 - `skillbridge-booking-service`
 - `skillbridge-user-service`
 - `skillbridge-code-review-service`
