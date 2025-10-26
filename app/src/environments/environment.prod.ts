@@ -1,11 +1,9 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.skillbridge.com', // Production API URL
+  apiUrl: 'http://18.141.4.247', // Frontend URL
   services: {
-    authService: 'https://auth.skillbridge.com',
-    userService: 'https://users.skillbridge.com',
-    bookingService: 'https://bookings.skillbridge.com', 
-    codeReviewService: 'https://reviews.skillbridge.com',
-    messagingService: 'https://messaging.skillbridge.com'
+    userService: 'http://13.214.136.130:3000/api/users',
+    bookingService: 'http://13.214.201.141:3000/api/bookings', 
+    codeReviewService: 'http://3.1.51.192:3000/api/reviews'
   }
 };
