@@ -5,8 +5,9 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:docker": "ng build --configuration=docker",
     "watch": "ng build --watch --configuration development",
-    "test": "ng tcd est"
+    "test": "ng test"
   },
   "private": true,
   "dependencies": {
