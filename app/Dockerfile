@@ -21,6 +21,9 @@ FROM nginx:alpine AS production
 # Remove default nginx files completely
 RUN rm -rf /usr/share/nginx/html/*
 
+# Copy custom nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+
 # Copy built application from builder stage
 COPY --from=builder /app/dist/app/browser /usr/share/nginx/html
 
