@@ -62,6 +62,7 @@ jobs:
           --cpu 256 \
           --memory 512 \
           --execution-role-arn arn:aws:iam::853519595029:role/ecsTaskExecutionRole \
+          --task-role-arn arn:aws:iam::853519595029:role/ecsTaskRole \
           --container-definitions "[{\"name\":\"$ECS_SERVICE\",\"image\":\"$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3003,\"protocol\":\"tcp\"}],\"essential\":true,\"environment\":[{\"name\":\"CODE_REVIEWS_TABLE_NAME\",\"value\":\"skillbridge-code-reviews\"},{\"name\":\"S3_BUCKET_NAME\",\"value\":\"skillbridge-code-reviews-bucket\"},{\"name\":\"AWS_REGION\",\"value\":\"ap-southeast-1\"}],\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/$ECR_REPOSITORY\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
           --region $AWS_REGION
 
