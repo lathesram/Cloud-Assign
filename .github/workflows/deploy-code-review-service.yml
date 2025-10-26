@@ -1,4 +1,5 @@
 name: Deploy Code Review Service
+# Fixed version with environment variables
 
 on:
   push:
@@ -52,30 +53,31 @@ jobs:
         # Create CloudWatch log group
         aws logs create-log-group --log-group-name /ecs/$ECR_REPOSITORY --region $AWS_REGION 2>/dev/null || echo "Log group exists"
         
+        # Always register new task definition with environment variables
+        echo "Registering new task definition with environment variables..."
+        aws ecs register-task-definition \
+          --family $ECR_REPOSITORY \
+          --network-mode awsvpc \
+          --requires-compatibilities FARGATE \
+          --cpu 256 \
+          --memory 512 \
+          --execution-role-arn arn:aws:iam::853519595029:role/ecsTaskExecutionRole \
+          --container-definitions "[{\"name\":\"$ECS_SERVICE\",\"image\":\"$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3003,\"protocol\":\"tcp\"}],\"essential\":true,\"environment\":[{\"name\":\"CODE_REVIEWS_TABLE_NAME\",\"value\":\"skillbridge-code-reviews\"},{\"name\":\"S3_BUCKET_NAME\",\"value\":\"skillbridge-code-reviews-bucket\"},{\"name\":\"AWS_REGION\",\"value\":\"ap-southeast-1\"}],\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/$ECR_REPOSITORY\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
+          --region $AWS_REGION
+
         # Check if service exists
         if aws ecs describe-services --cluster $ECS_CLUSTER --services $ECS_SERVICE --region $AWS_REGION --query 'services[0].status' --output text 2>/dev/null | grep -q "ACTIVE"; then
-          echo "Service exists, updating..."
+          echo "Service exists, updating to use new task definition..."
           aws ecs update-service \
             --cluster $ECS_CLUSTER \
             --service $ECS_SERVICE \
-            --force-new-deployment \
+            --task-definition $ECR_REPOSITORY \
             --region $AWS_REGION
         else
           echo "Service doesn't exist, creating..."
           # Get default VPC and subnets
           VPC_ID=$(aws ec2 describe-vpcs --filters "Name=is-default,Values=true" --query 'Vpcs[0].VpcId' --output text --region $AWS_REGION)
           SUBNET_IDS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" --query 'Subnets[0:2].SubnetId' --output text --region $AWS_REGION | tr '\t' ',')
-          
-          # Register task definition
-          aws ecs register-task-definition \
-            --family $ECR_REPOSITORY \
-            --network-mode awsvpc \
-            --requires-compatibilities FARGATE \
-            --cpu 256 \
-            --memory 512 \
-            --execution-role-arn arn:aws:iam::853519595029:role/ecsTaskExecutionRole \
-            --container-definitions "[{\"name\":\"$ECS_SERVICE\",\"image\":\"$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3003,\"protocol\":\"tcp\"}],\"essential\":true,\"environment\":[{\"name\":\"CODE_REVIEWS_TABLE_NAME\",\"value\":\"skillbridge-code-reviews\"},{\"name\":\"S3_BUCKET_NAME\",\"value\":\"skillbridge-code-reviews-bucket\"},{\"name\":\"AWS_REGION\",\"value\":\"ap-southeast-1\"}],\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/$ECR_REPOSITORY\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
-            --region $AWS_REGION
           
           # Create the service
           aws ecs create-service \
@@ -87,4 +89,3 @@ jobs:
             --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],assignPublicIp=ENABLED}" \
             --region $AWS_REGION
         fi
-
