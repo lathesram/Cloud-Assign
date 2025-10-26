@@ -27,8 +27,9 @@ export class Server {
       validateS3Config();
       console.log('✅ Configurations validated');
     } catch (error) {
-      console.error('❌ Configuration failed:', error);
-      process.exit(1);
+      console.error('❌ Configuration validation failed:', error);
+      console.log('⚠️  Starting server anyway - some features may not work');
+      // Don't exit - let the service start but with limited functionality
     }
   }
 

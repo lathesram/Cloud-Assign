@@ -63,7 +63,7 @@ jobs:
           --memory 512 \
           --execution-role-arn arn:aws:iam::853519595029:role/ecsTaskExecutionRole \
           --task-role-arn arn:aws:iam::853519595029:role/ecsTaskRole \
-          --container-definitions "[{\"name\":\"$ECS_SERVICE\",\"image\":\"$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3003,\"protocol\":\"tcp\"}],\"essential\":true,\"environment\":[{\"name\":\"CODE_REVIEWS_TABLE_NAME\",\"value\":\"skillbridge-code-reviews\"},{\"name\":\"S3_BUCKET_NAME\",\"value\":\"skillbridge-code-reviews-bucket\"},{\"name\":\"AWS_REGION\",\"value\":\"ap-southeast-1\"}],\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/$ECR_REPOSITORY\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
+          --container-definitions "[{\"name\":\"$ECS_SERVICE\",\"image\":\"$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3003,\"protocol\":\"tcp\"}],\"essential\":true,\"environment\":[{\"name\":\"CODE_REVIEWS_TABLE_NAME\",\"value\":\"skillbridge-code-reviews\"},{\"name\":\"S3_BUCKET_NAME\",\"value\":\"skillbridge-code-reviews-bucket\"},{\"name\":\"AWS_REGION\",\"value\":\"ap-southeast-1\"}],\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/$ECR_REPOSITORY\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}},\"healthCheck\":{\"command\":[\"CMD-SHELL\",\"curl -f http://localhost:3003/health || exit 1\"],\"interval\":30,\"timeout\":10,\"retries\":5,\"startPeriod\":120}}]" \
           --region $AWS_REGION
 
         # Check if service exists
@@ -80,6 +80,9 @@ jobs:
           VPC_ID=$(aws ec2 describe-vpcs --filters "Name=is-default,Values=true" --query 'Vpcs[0].VpcId' --output text --region $AWS_REGION)
           SUBNET_IDS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" --query 'Subnets[0:2].SubnetId' --output text --region $AWS_REGION | tr '\t' ',')
           
+          # Get or create default security group that allows all traffic
+          DEFAULT_SG=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$VPC_ID" "Name=group-name,Values=default" --query 'SecurityGroups[0].GroupId' --output text --region $AWS_REGION)
+          
           # Create the service
           aws ecs create-service \
             --cluster $ECS_CLUSTER \
@@ -87,6 +90,6 @@ jobs:
             --task-definition $ECR_REPOSITORY \
             --desired-count 1 \
             --launch-type FARGATE \
-            --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],assignPublicIp=ENABLED}" \
+            --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],securityGroups=[$DEFAULT_SG],assignPublicIp=ENABLED}" \
             --region $AWS_REGION
         fi
