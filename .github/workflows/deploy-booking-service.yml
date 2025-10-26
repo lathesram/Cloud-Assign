@@ -74,7 +74,7 @@ jobs:
             --cpu 256 \
             --memory 512 \
             --execution-role-arn arn:aws:iam::853519595029:role/ecsTaskExecutionRole \
-            --container-definitions "[{\"name\":\"$ECS_SERVICE\",\"image\":\"$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3000,\"protocol\":\"tcp\"}],\"essential\":true,\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/$ECR_REPOSITORY\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
+            --container-definitions "[{\"name\":\"$ECS_SERVICE\",\"image\":\"$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3002,\"protocol\":\"tcp\"}],\"essential\":true,\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/$ECR_REPOSITORY\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
             --region $AWS_REGION
           
           # Create the service

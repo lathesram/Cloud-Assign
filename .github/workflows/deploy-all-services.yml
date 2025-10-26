@@ -139,7 +139,7 @@ jobs:
             --cpu 256 \
             --memory 512 \
             --execution-role-arn arn:aws:iam::853519595029:role/ecsTaskExecutionRole \
-            --container-definitions "[{\"name\":\"booking-service\",\"image\":\"$ECR_REGISTRY/skillbridge-booking-service:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3000,\"protocol\":\"tcp\"}],\"essential\":true,\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/skillbridge-booking-service\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
+            --container-definitions "[{\"name\":\"booking-service\",\"image\":\"$ECR_REGISTRY/skillbridge-booking-service:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3002,\"protocol\":\"tcp\"}],\"essential\":true,\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/skillbridge-booking-service\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
             --region $AWS_REGION
           
           # Create the service
@@ -207,7 +207,7 @@ jobs:
             --cpu 256 \
             --memory 512 \
             --execution-role-arn arn:aws:iam::853519595029:role/ecsTaskExecutionRole \
-            --container-definitions "[{\"name\":\"user-service\",\"image\":\"$ECR_REGISTRY/skillbridge-user-service:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3000,\"protocol\":\"tcp\"}],\"essential\":true,\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/skillbridge-user-service\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
+            --container-definitions "[{\"name\":\"user-service\",\"image\":\"$ECR_REGISTRY/skillbridge-user-service:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3005,\"protocol\":\"tcp\"}],\"essential\":true,\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/skillbridge-user-service\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
             --region $AWS_REGION
           
           # Create the service
@@ -275,7 +275,7 @@ jobs:
             --cpu 256 \
             --memory 512 \
             --execution-role-arn arn:aws:iam::853519595029:role/ecsTaskExecutionRole \
-            --container-definitions "[{\"name\":\"code-review-service\",\"image\":\"$ECR_REGISTRY/skillbridge-code-review-service:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3000,\"protocol\":\"tcp\"}],\"essential\":true,\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/skillbridge-code-review-service\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
+            --container-definitions "[{\"name\":\"code-review-service\",\"image\":\"$ECR_REGISTRY/skillbridge-code-review-service:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3003,\"protocol\":\"tcp\"}],\"essential\":true,\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/skillbridge-code-review-service\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
             --region $AWS_REGION
           
           # Create the service
