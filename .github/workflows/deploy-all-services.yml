@@ -24,6 +24,13 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
+    - name: Create CloudWatch Log Groups
+      run: |
+        aws logs create-log-group --log-group-name /ecs/skillbridge-frontend-app --region $AWS_REGION 2>/dev/null || echo "Frontend log group exists"
+        aws logs create-log-group --log-group-name /ecs/skillbridge-booking-service --region $AWS_REGION 2>/dev/null || echo "Booking log group exists"
+        aws logs create-log-group --log-group-name /ecs/skillbridge-user-service --region $AWS_REGION 2>/dev/null || echo "User log group exists"
+        aws logs create-log-group --log-group-name /ecs/skillbridge-code-review-service --region $AWS_REGION 2>/dev/null || echo "Code review log group exists"
+
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
@@ -37,13 +44,46 @@ jobs:
         docker build -t $ECR_REGISTRY/skillbridge-frontend-app:$IMAGE_TAG .
         docker push $ECR_REGISTRY/skillbridge-frontend-app:$IMAGE_TAG
 
-    - name: Update frontend service
+    - name: Deploy or update frontend service
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        aws ecs update-service \
-          --cluster $ECS_CLUSTER \
-          --service frontend-app \
-          --force-new-deployment \
-          --region $AWS_REGION
+        # Check if service exists
+        if aws ecs describe-services --cluster $ECS_CLUSTER --services frontend-app --region $AWS_REGION --query 'services[0].status' --output text 2>/dev/null | grep -q "ACTIVE"; then
+          echo "Service exists, updating..."
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service frontend-app \
+            --force-new-deployment \
+            --region $AWS_REGION
+        else
+          echo "Service doesn't exist, creating..."
+          # Get default VPC and subnets
+          VPC_ID=$(aws ec2 describe-vpcs --filters "Name=is-default,Values=true" --query 'Vpcs[0].VpcId' --output text --region $AWS_REGION)
+          SUBNET_IDS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" --query 'Subnets[0:2].SubnetId' --output text --region $AWS_REGION | tr '\t' ',')
+          
+          # Update task definition with new image
+          aws ecs register-task-definition \
+            --family skillbridge-frontend-app \
+            --network-mode awsvpc \
+            --requires-compatibilities FARGATE \
+            --cpu 256 \
+            --memory 512 \
+            --execution-role-arn arn:aws:iam::853519595029:role/ecsTaskExecutionRole \
+            --container-definitions "[{\"name\":\"frontend-app\",\"image\":\"$ECR_REGISTRY/skillbridge-frontend-app:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":80,\"protocol\":\"tcp\"}],\"essential\":true,\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/skillbridge-frontend-app\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
+            --region $AWS_REGION
+          
+          # Create the service
+          aws ecs create-service \
+            --cluster $ECS_CLUSTER \
+            --service-name frontend-app \
+            --task-definition skillbridge-frontend-app \
+            --desired-count 1 \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],assignPublicIp=ENABLED}" \
+            --region $AWS_REGION
+        fi
 
   deploy-booking:
     name: Deploy Booking Service
@@ -72,13 +112,46 @@ jobs:
         docker build -t $ECR_REGISTRY/skillbridge-booking-service:$IMAGE_TAG .
         docker push $ECR_REGISTRY/skillbridge-booking-service:$IMAGE_TAG
 
-    - name: Update booking service
+    - name: Deploy or update booking service
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        aws ecs update-service \
-          --cluster $ECS_CLUSTER \
-          --service booking-service \
-          --force-new-deployment \
-          --region $AWS_REGION
+        # Check if service exists
+        if aws ecs describe-services --cluster $ECS_CLUSTER --services booking-service --region $AWS_REGION --query 'services[0].status' --output text 2>/dev/null | grep -q "ACTIVE"; then
+          echo "Service exists, updating..."
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service booking-service \
+            --force-new-deployment \
+            --region $AWS_REGION
+        else
+          echo "Service doesn't exist, creating..."
+          # Get default VPC and subnets
+          VPC_ID=$(aws ec2 describe-vpcs --filters "Name=is-default,Values=true" --query 'Vpcs[0].VpcId' --output text --region $AWS_REGION)
+          SUBNET_IDS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" --query 'Subnets[0:2].SubnetId' --output text --region $AWS_REGION | tr '\t' ',')
+          
+          # Update task definition with new image
+          aws ecs register-task-definition \
+            --family skillbridge-booking-service \
+            --network-mode awsvpc \
+            --requires-compatibilities FARGATE \
+            --cpu 256 \
+            --memory 512 \
+            --execution-role-arn arn:aws:iam::853519595029:role/ecsTaskExecutionRole \
+            --container-definitions "[{\"name\":\"booking-service\",\"image\":\"$ECR_REGISTRY/skillbridge-booking-service:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3000,\"protocol\":\"tcp\"}],\"essential\":true,\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/skillbridge-booking-service\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
+            --region $AWS_REGION
+          
+          # Create the service
+          aws ecs create-service \
+            --cluster $ECS_CLUSTER \
+            --service-name booking-service \
+            --task-definition skillbridge-booking-service \
+            --desired-count 1 \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],assignPublicIp=ENABLED}" \
+            --region $AWS_REGION
+        fi
 
   deploy-user:
     name: Deploy User Service
@@ -107,13 +180,46 @@ jobs:
         docker build -t $ECR_REGISTRY/skillbridge-user-service:$IMAGE_TAG .
         docker push $ECR_REGISTRY/skillbridge-user-service:$IMAGE_TAG
 
-    - name: Update user service
+    - name: Deploy or update user service
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        aws ecs update-service \
-          --cluster $ECS_CLUSTER \
-          --service user-service \
-          --force-new-deployment \
-          --region $AWS_REGION
+        # Check if service exists
+        if aws ecs describe-services --cluster $ECS_CLUSTER --services user-service --region $AWS_REGION --query 'services[0].status' --output text 2>/dev/null | grep -q "ACTIVE"; then
+          echo "Service exists, updating..."
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service user-service \
+            --force-new-deployment \
+            --region $AWS_REGION
+        else
+          echo "Service doesn't exist, creating..."
+          # Get default VPC and subnets
+          VPC_ID=$(aws ec2 describe-vpcs --filters "Name=is-default,Values=true" --query 'Vpcs[0].VpcId' --output text --region $AWS_REGION)
+          SUBNET_IDS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" --query 'Subnets[0:2].SubnetId' --output text --region $AWS_REGION | tr '\t' ',')
+          
+          # Update task definition with new image
+          aws ecs register-task-definition \
+            --family skillbridge-user-service \
+            --network-mode awsvpc \
+            --requires-compatibilities FARGATE \
+            --cpu 256 \
+            --memory 512 \
+            --execution-role-arn arn:aws:iam::853519595029:role/ecsTaskExecutionRole \
+            --container-definitions "[{\"name\":\"user-service\",\"image\":\"$ECR_REGISTRY/skillbridge-user-service:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3000,\"protocol\":\"tcp\"}],\"essential\":true,\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/skillbridge-user-service\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
+            --region $AWS_REGION
+          
+          # Create the service
+          aws ecs create-service \
+            --cluster $ECS_CLUSTER \
+            --service-name user-service \
+            --task-definition skillbridge-user-service \
+            --desired-count 1 \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],assignPublicIp=ENABLED}" \
+            --region $AWS_REGION
+        fi
 
   deploy-code-review:
     name: Deploy Code Review Service
@@ -142,10 +248,43 @@ jobs:
         docker build -t $ECR_REGISTRY/skillbridge-code-review-service:$IMAGE_TAG .
         docker push $ECR_REGISTRY/skillbridge-code-review-service:$IMAGE_TAG
 
-    - name: Update code review service
+    - name: Deploy or update code review service
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        aws ecs update-service \
-          --cluster $ECS_CLUSTER \
-          --service code-review-service \
-          --force-new-deployment \
-          --region $AWS_REGION
+        # Check if service exists
+        if aws ecs describe-services --cluster $ECS_CLUSTER --services code-review-service --region $AWS_REGION --query 'services[0].status' --output text 2>/dev/null | grep -q "ACTIVE"; then
+          echo "Service exists, updating..."
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service code-review-service \
+            --force-new-deployment \
+            --region $AWS_REGION
+        else
+          echo "Service doesn't exist, creating..."
+          # Get default VPC and subnets
+          VPC_ID=$(aws ec2 describe-vpcs --filters "Name=is-default,Values=true" --query 'Vpcs[0].VpcId' --output text --region $AWS_REGION)
+          SUBNET_IDS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" --query 'Subnets[0:2].SubnetId' --output text --region $AWS_REGION | tr '\t' ',')
+          
+          # Update task definition with new image
+          aws ecs register-task-definition \
+            --family skillbridge-code-review-service \
+            --network-mode awsvpc \
+            --requires-compatibilities FARGATE \
+            --cpu 256 \
+            --memory 512 \
+            --execution-role-arn arn:aws:iam::853519595029:role/ecsTaskExecutionRole \
+            --container-definitions "[{\"name\":\"code-review-service\",\"image\":\"$ECR_REGISTRY/skillbridge-code-review-service:$IMAGE_TAG\",\"portMappings\":[{\"containerPort\":3000,\"protocol\":\"tcp\"}],\"essential\":true,\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/ecs/skillbridge-code-review-service\",\"awslogs-region\":\"$AWS_REGION\",\"awslogs-stream-prefix\":\"ecs\"}}}]" \
+            --region $AWS_REGION
+          
+          # Create the service
+          aws ecs create-service \
+            --cluster $ECS_CLUSTER \
+            --service-name code-review-service \
+            --task-definition skillbridge-code-review-service \
+            --desired-count 1 \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],assignPublicIp=ENABLED}" \
+            --region $AWS_REGION
+        fi
