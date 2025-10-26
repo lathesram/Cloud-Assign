@@ -2,8 +2,8 @@ export const environment = {
   production: true,
   apiUrl: '/api', // Use nginx proxy
   services: {
-    userService: 'http://13.214.136.130:3005/api/users', 
-    bookingService: 'http://13.214.201.141:3002/api/bookings',
-    codeReviewService: 'http://3.1.51.192:3003/api/reviews'
+    userService: 'http://47.129.127.2:3005/api/users', 
+    bookingService: 'http://54.179.190.146:3002/api/bookings',
+    codeReviewService: 'http://code-review-service:3003/api/reviews' // Using service name for now
   }
 };

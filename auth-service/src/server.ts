@@ -32,17 +32,7 @@ export class Server {
     }));
 
     this.app.use(cors({
-      origin: process.env.ALLOWED_ORIGINS?.split(',') || [
-        'http://localhost:3000', 
-        'http://localhost:4200', 
-        'http://localhost:80',
-        'http://localhost',
-        'http://127.0.0.1:80',
-        'http://127.0.0.1',
-        // Allow Docker internal communication
-        'http://app:80',
-        'http://app'
-      ],
+      origin: true, // Allow all origins
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
       allowedHeaders: [
