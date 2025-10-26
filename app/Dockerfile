@@ -7,14 +7,14 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install all dependencies (including devDependencies for build)
+RUN npm ci
 
 # Copy source code
 COPY . .
 
 # Build the Angular app for Docker environment
-RUN npm run build:docker
+RUN npx ng build --configuration=docker
 
 # Production stage - serve with nginx
 FROM nginx:alpine AS production
