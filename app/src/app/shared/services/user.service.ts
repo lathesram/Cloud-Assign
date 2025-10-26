@@ -36,10 +36,25 @@ export class UserService extends BaseHttpService {
       );
   }
   getUserById(userId: string): Observable<User> {
-    return this.http.get<ApiResponse<User>>(`${this.baseUrl}/${userId}`)
+    const url = `${this.baseUrl}/${userId}`;
+    console.log('Making API call to:', url);
+    
+    return this.http.get<any>(url)
       .pipe(
-        map(response => this.handleResponse<User>(response)),
-        catchError(this.handleError)
+        map(response => {
+          console.log('Raw API Response for getUserById:', response);
+          if (response.success === false) {
+            throw new Error(response.message || 'Request failed');
+          }
+          // Backend returns data in 'user' property, not 'data'
+          const userData = response.user || response.data || response;
+          console.log('Extracted user data:', userData);
+          return userData;
+        }),
+        catchError((error) => {
+          console.error('API Error in getUserById:', error);
+          return this.handleError(error);
+        })
       );
   }
   getUserProfile(userId: string): Observable<UserProfile> {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -12,6 +12,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { Subscription } from 'rxjs';
 import { UserService } from '../../../../shared/services/user.service';
 import { User, CreateUserRequest, UpdateUserRequest, Availability } from '../../../../shared/models/user.model';
 import { AvailabilitySchedulerComponent } from '../../../../shared/components/availability-scheduler/availability-scheduler.component';
@@ -43,6 +44,7 @@ import { AvailabilitySchedulerComponent } from '../../../../shared/components/av
       
       <div class="form-container">
         <div class="content-card">
+              
               @if (loading) {
                 <div class="text-center py-4">
                   <mat-spinner></mat-spinner>
@@ -170,14 +172,7 @@ import { AvailabilitySchedulerComponent } from '../../../../shared/components/av
                   <div class="mb-3">
                     <mat-form-field class="w-100">
                       <mat-label>Bio</mat-label>
-                      <textarea matInput formControlName="bio" rows="4" placeholder="Tell us about yourself..."></textarea>
-                    </mat-form-field>
-                  </div>
-
-                  <div class="mb-3">
-                    <mat-form-field class="w-100">
-                      <mat-label>Experience</mat-label>
-                      <textarea matInput formControlName="experience" rows="3" placeholder="Describe your experience..."></textarea>
+                      <textarea matInput formControlName="bio" rows="6" placeholder="Tell us about yourself and your experience..."></textarea>
                     </mat-form-field>
                   </div>
 
@@ -476,7 +471,7 @@ import { AvailabilitySchedulerComponent } from '../../../../shared/components/av
     }
   `
 })
-export class UserFormComponent implements OnInit {
+export class UserFormComponent implements OnInit, OnDestroy {
   userForm: FormGroup;
   isEditMode = false;
   loading = false;
@@ -486,6 +481,7 @@ export class UserFormComponent implements OnInit {
   currentSkill = '';
   currentAvailability: Availability | null = null;
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
+  private subscription: Subscription = new Subscription();
 
   constructor(
     private fb: FormBuilder,
@@ -499,7 +495,7 @@ export class UserFormComponent implements OnInit {
       type: ['', Validators.required],
       domain: [''],
       seniority: [''],
-      bio: ['', Validators.maxLength(500)],
+      bio: ['', Validators.maxLength(1000)],
       experience: [null, [Validators.min(0), Validators.max(50)]],
       hourlyRate: [null, [Validators.min(0), Validators.max(1000)]],
       linkedinProfile: ['', Validators.pattern('https?://.+')],
@@ -509,41 +505,115 @@ export class UserFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('🚀 UserFormComponent ngOnInit called');
+    
+    // Get initial route params
     this.userId = this.route.snapshot.paramMap.get('id');
     this.isEditMode = !!this.userId;
     
-    if (this.isEditMode && this.userId) {
+    console.log('📍 Route debug:', {
+      url: this.router.url,
+      userId: this.userId,
+      isEditMode: this.isEditMode,
+      params: this.route.snapshot.params
+    });
+    
+    if (this.userId) {
+      console.log('✅ Found userId, calling loadUser');
       this.loadUser(this.userId);
+    } else {
+      console.log('❌ No userId found in route');
     }
+    
+    // TEMPORARY TEST: Set some test data to see if form fields work
+    setTimeout(() => {
+      console.log('🧪 Setting test data...');
+      this.userForm.patchValue({
+        name: 'Test Name',
+        email: 'test@example.com',
+        type: 'mentor',
+        bio: 'Test bio content'
+      });
+      console.log('🧪 Test data set. Form value:', this.userForm.value);
+    }, 2000);
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
+  private resetForm(): void {
+    this.userForm.reset();
+    this.skills = [];
+    this.currentAvailability = null;
+    this.loading = false;
+    this.submitting = false;
   }
 
   loadUser(userId: string): void {
+    if (!userId) {
+      console.error('No userId provided to loadUser');
+      return;
+    }
+    
+    console.log('=== LOAD USER DEBUG ===');
+    console.log('Loading user with ID:', userId);
     this.loading = true;
-    this.userService.getUserById(userId).subscribe({
-      next: (user) => {
-        this.userForm.patchValue({
-          name: user.name,
-          email: user.email,
-          type: user.type,
-          domain: user.domain || '',
-          seniority: user.seniority || '',
-          bio: user.bio || '',
-          experience: user.experience || null,
-          hourlyRate: user.hourlyRate || null,
-          linkedinProfile: user.linkedinProfile || '',
-          githubProfile: user.githubProfile || '',
-          isActive: user.isActive
-        });
-        this.skills = user.skills || [];
-        this.currentAvailability = user.availability || null;
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error loading user:', error);
-        this.loading = false;
-        this.router.navigate(['/users']);
-      }
-    });
+    
+    // Test the API call directly
+    console.log('Making API call to:', `${this.userService['baseUrl']}/${userId}`);
+    
+    this.subscription.add(
+      this.userService.getUserById(userId).subscribe({
+        next: (user) => {
+          console.log('=== USER DATA RECEIVED ===');
+          console.log('Raw user data:', JSON.stringify(user, null, 2));
+          
+          if (!user) {
+            console.error('No user data received from API');
+            this.loading = false;
+            return;
+          }
+          
+          // Simple patchValue approach
+          console.log('Before patching - form value:', this.userForm.value);
+          
+          this.userForm.patchValue({
+            name: user.name,
+            email: user.email,
+            type: user.type,
+            domain: user.domain,
+            seniority: user.seniority,
+            bio: user.bio,
+            experience: user.experience,
+            hourlyRate: user.hourlyRate,
+            linkedinProfile: user.linkedinProfile,
+            githubProfile: user.githubProfile,
+            isActive: user.isActive
+          });
+          
+          this.skills = user.skills || [];
+          this.currentAvailability = user.availability || null;
+          
+          console.log('After patching - form value:', this.userForm.value);
+          console.log('Form controls state:');
+          Object.keys(this.userForm.controls).forEach(key => {
+            const control = this.userForm.get(key);
+            console.log(`${key}: value="${control?.value}", valid=${control?.valid}`);
+          });
+          
+          this.loading = false;
+          console.log('=== LOAD USER COMPLETE ===');
+        },
+        error: (error) => {
+          console.error('=== API ERROR ===');
+          console.error('Full error object:', error);
+          console.error('Error message:', error.message);
+          console.error('Error status:', error.status);
+          this.loading = false;
+        }
+      })
+    );
   }
 
   onSkillInput(event: Event): void {
