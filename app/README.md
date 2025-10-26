@@ -1,91 +1,102 @@
-# SkillBridge Frontend App - Docker Setup
+# SkillBridge Frontend App - Docker Configuration
 
-This directory contains the Angular frontend application for the SkillBridge platform, now containerized with Docker.
+This directory contains the Angular frontend application for the SkillBridge platform, containerized with Docker following the same patterns as the backend services.
 
-## Docker Configuration
+## Docker Architecture
 
-### Files Added
-- `Dockerfile` - Multi-stage build configuration
-- `nginx.conf` - Custom Nginx configuration for serving the Angular app
-- `.dockerignore` - Optimizes build context by excluding unnecessary files
-- `src/environments/environment.docker.ts` - Docker-specific environment configuration
+### Multi-stage Build
+- **Stage 1 (Builder)**: Node.js 18 Alpine - Compiles the Angular application
+- **Stage 2 (Production)**: Nginx Alpine - Serves the static files with optimized configuration
 
-### Build Configuration
-The Angular app includes a Docker-specific build configuration that:
-- Uses optimized production settings
-- Replaces environment files with Docker-specific versions
-- Configures API endpoints to work within the Docker network
+### Security Features
+- Non-root user execution (nginxuser:1001)
+- Security headers (XSS protection, Content-Type options, etc.)
+- Proper file ownership and permissions
 
-## Building and Running
+## Configuration Files
 
-### With Docker Compose (Recommended)
+### `Dockerfile`
+- Multi-stage build following the same pattern as backend services
+- Uses Node.js 18 Alpine for building
+- Uses Nginx Alpine for production serving
+- Includes health checks and security configurations
+
+### `nginx.conf`
+- Custom Nginx configuration optimized for Angular SPA
+- API proxying to backend services
+- WebSocket support for real-time messaging
+- Static asset caching and Gzip compression
+- Health check endpoint at `/health`
+
+### `.dockerignore`
+- Optimizes build context by excluding unnecessary files
+- Reduces image size and build time
+
+### Environment Configuration
+- `environment.docker.ts` - Docker-specific environment settings
+- Uses Nginx proxy paths for API calls (`/api/*`)
+- Configured for internal Docker network communication
+
+## API Routing
+
+The Nginx configuration includes proxy rules for all backend services:
+
+- `/api/auth/*` → `auth-service:3001`
+- `/api/users/*` → `user-service:3005`
+- `/api/bookings/*` → `booking-service:3002`
+- `/api/reviews/*` → `code-review-service:3003`
+- `/api/messages/*` → `messaging-service:3004`
+- `/socket.io/*` → `messaging-service:3004` (WebSocket)
+
+## Docker Compose Integration
+
+The app service in `docker-compose.yml`:
+- Exposes port 80 for HTTP traffic
+- Depends on all backend services
+- Includes health checks and logging
+- Connected to the `skillbridge-network`
+
+## Build Commands
+
 ```bash
-# Build and run all services including the frontend
-docker-compose up --build
+# Build using Docker Compose (recommended)
+docker-compose build app
 
-# Run in detached mode
-docker-compose up -d --build
+# Build standalone
+docker build -t skillbridge-app ./app
 
-# View logs
+# Run all services
+docker-compose up -d
+
+# View app logs
 docker-compose logs app
-```
-
-### Standalone Docker Build
-```bash
-# Build the image
-docker build -t skillbridge-app .
-
-# Run the container
-docker run -p 80:80 skillbridge-app
 ```
 
 ## Access Points
 
-- **Frontend App**: http://localhost (port 80)
-- **Alternative Port**: http://localhost:4200 (mapped to port 80)
+- **Frontend Application**: http://localhost
 - **Health Check**: http://localhost/health
-
-## Network Configuration
-
-The app runs in the `skillbridge-network` Docker network and can communicate with backend services using their service names:
-- `auth-service:3001`
-- `user-service:3005` 
-- `booking-service:3002`
-- `code-review-service:3003`
-- `messaging-service:3004`
-
-## Nginx Features
-
-- **SPA Routing**: Handles Angular routing with fallback to index.html
-- **Static Asset Caching**: Optimized caching for JS, CSS, and image files
-- **Security Headers**: Includes common security headers
-- **Gzip Compression**: Reduces payload sizes
-- **API Proxy**: Optional proxy configuration for backend services
-- **Health Check Endpoint**: `/health` for container health monitoring
-
-## Environment Variables
-
-The Docker environment uses internal service names for API communication. The environment is configured in `src/environments/environment.docker.ts`.
+- **API Endpoints**: http://localhost/api/*
 
 ## Development vs Production
 
-- **Development**: Uses `npm start` with live reload
-- **Docker**: Uses optimized build with Nginx serving static files
-- **Production**: Can be deployed to any container orchestration platform
+- **Development**: Use `npm start` for live reload and development server
+- **Docker**: Optimized production build served by Nginx
+- **Environment**: Uses Docker-specific configuration with proxy paths
 
 ## Troubleshooting
 
 ### Build Issues
-- Ensure Node.js dependencies are properly installed
-- Check that all environment files exist
-- Verify Angular build configuration is valid
+- Ensure all dependencies are properly defined in package.json
+- Check that Angular build configuration is valid
+- Verify environment files exist
 
 ### Runtime Issues
 - Check container logs: `docker-compose logs app`
-- Verify network connectivity to backend services
 - Test health endpoint: `curl http://localhost/health`
+- Verify backend services are running and accessible
 
-### Performance
-- The app uses multi-stage builds to minimize image size
-- Static assets are cached aggressively
-- Gzip compression is enabled for better performance
+### Network Issues
+- Ensure all services are on the same Docker network
+- Check service names match those used in nginx.conf
+- Verify port configurations in docker-compose.yml

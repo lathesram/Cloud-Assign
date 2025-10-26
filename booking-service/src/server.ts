@@ -20,12 +20,32 @@ export class Server {
   }
 
   private setupMiddlewares(): void {
-    // Enable CORS for all origins during development
+    // Enable CORS with proper configuration
     this.app.use(cors({
-      origin: '*',  // Allow all origins for development
-      credentials: false,
+      origin: process.env.ALLOWED_ORIGINS?.split(',') || [
+        'http://localhost:3000', 
+        'http://localhost:4200', 
+        'http://localhost:80',
+        'http://localhost',
+        'http://127.0.0.1:80',
+        'http://127.0.0.1',
+        // Allow Docker internal communication
+        'http://app:80',
+        'http://app'
+      ],
+      credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
+      allowedHeaders: [
+        'Content-Type', 
+        'Authorization', 
+        'X-Requested-With', 
+        'Accept', 
+        'Origin',
+        'Access-Control-Request-Method',
+        'Access-Control-Request-Headers'
+      ],
+      preflightContinue: false,
+      optionsSuccessStatus: 204
     }));
     
     this.app.use(helmet({

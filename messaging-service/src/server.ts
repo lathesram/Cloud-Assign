@@ -33,10 +33,30 @@ export class MessagingServer {
     this.app.use(morgan('combined'));
 
     this.app.use(cors({
-      origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:4200'],
+      origin: process.env.ALLOWED_ORIGINS?.split(',') || [
+        'http://localhost:3000', 
+        'http://localhost:4200', 
+        'http://localhost:80',
+        'http://localhost',
+        'http://127.0.0.1:80',
+        'http://127.0.0.1',
+        // Allow Docker internal communication
+        'http://app:80',
+        'http://app'
+      ],
       credentials: true,
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+      allowedHeaders: [
+        'Content-Type', 
+        'Authorization', 
+        'X-Requested-With', 
+        'Accept', 
+        'Origin',
+        'Access-Control-Request-Method',
+        'Access-Control-Request-Headers'
+      ],
+      preflightContinue: false,
+      optionsSuccessStatus: 204
     }));
 
     this.app.use(express.json());
